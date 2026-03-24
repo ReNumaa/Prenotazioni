@@ -1,4 +1,4 @@
-const CACHE_NAME = 'prenotazioni-v7';
+const CACHE_NAME = 'prenotazioni-v8';
 
 // Paths relativi — funzionano sia su dominio root che su GitHub Pages subfolder
 const APP_SHELL = [
