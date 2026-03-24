@@ -48,6 +48,7 @@ async function resolveTenant() {
         description: 'Sistema di prenotazione appuntamenti',
         phone: '', email: '', address: '', maps_url: '',
         logo_url: '', primary_color: '#4F46E5', header_color: '#1e1b4b',
+        about_title: '', about_text: '', about_image: '',
         slot_duration: '60 minuti', booking_notice: '',
         // Orari
         opening_time: '09:00', closing_time: '19:00',
@@ -150,6 +151,40 @@ function _applyTenantConfig(tenant) {
                 addr.style.cursor = 'pointer';
                 addr.onclick = () => window.open(tenant.maps_url, '_blank');
             }
+        }
+    }
+
+    // Sezione "Chi sono" (index.html)
+    const aboutSection = document.getElementById('aboutSection');
+    if (aboutSection && (tenant.about_title || tenant.about_text)) {
+        aboutSection.style.display = '';
+        const aboutTitle = document.getElementById('aboutTitle');
+        if (aboutTitle) aboutTitle.textContent = tenant.about_title || 'Chi sono';
+        const aboutText = document.getElementById('aboutText');
+        if (aboutText) {
+            // Supporta newline → paragrafi
+            aboutText.innerHTML = (tenant.about_text || '').split('\n').filter(p => p.trim())
+                .map(p => `<p>${_escHtml(p)}</p>`).join('');
+        }
+        // Contatti sotto il testo about
+        const aboutContact = document.getElementById('aboutContact');
+        if (aboutContact) {
+            let contactHtml = '';
+            if (tenant.phone) contactHtml += `<a href="tel:${_escHtml(tenant.phone)}" class="about-contact-item">📞 ${_escHtml(tenant.phone)}</a>`;
+            if (tenant.email) contactHtml += `<a href="mailto:${_escHtml(tenant.email)}" class="about-contact-item">📧 ${_escHtml(tenant.email)}</a>`;
+            if (tenant.address) {
+                const addrLink = tenant.maps_url ? `<a href="${_escHtml(tenant.maps_url)}" target="_blank" rel="noopener" class="about-contact-item">📍 ${_escHtml(tenant.address)}</a>` : `<span class="about-contact-item">📍 ${_escHtml(tenant.address)}</span>`;
+                contactHtml += addrLink;
+            }
+            aboutContact.innerHTML = contactHtml;
+        }
+        // Immagine about
+        const aboutImageWrap = document.getElementById('aboutImageWrap');
+        const aboutImage = document.getElementById('aboutImage');
+        if (aboutImageWrap && aboutImage && tenant.about_image) {
+            aboutImage.src = tenant.about_image;
+            aboutImage.alt = tenant.about_title || tenant.name || '';
+            aboutImageWrap.style.display = '';
         }
     }
 

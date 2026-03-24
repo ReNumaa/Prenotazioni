@@ -26,6 +26,10 @@ CREATE TABLE tenants (
     logo_url TEXT DEFAULT '',
     primary_color TEXT DEFAULT '#4F46E5',
     header_color TEXT DEFAULT '#1e1b4b',
+    -- Chi sono / About
+    about_title TEXT DEFAULT '',                -- es. "Chi sono", "Il nostro studio", "About"
+    about_text TEXT DEFAULT '',                 -- testo libero (bio, storia, specializzazioni)
+    about_image TEXT DEFAULT '',                -- foto (base64 o URL)
     slot_duration TEXT DEFAULT '60 minuti',
     booking_notice TEXT DEFAULT '',
     -- Orari giornalieri

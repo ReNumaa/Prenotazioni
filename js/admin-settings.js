@@ -300,6 +300,37 @@ function renderSettingsPanel() {
             ${biz.logoUrl ? `<div style="margin-top:0.5rem;"><img src="${_escHtml(biz.logoUrl)}" alt="Logo" style="max-height:80px;border-radius:8px;border:1px solid #eee;"></div>` : ''}
         </div>
 
+        <!-- Chi sono -->
+        <div class="settings-card">
+            <h4 class="settings-card-title">Chi sono / Presentazione</h4>
+            <p style="font-size:0.8rem;color:#888;margin-bottom:0.75rem;">
+                Questa sezione appare nella pagina pubblica sotto il calendario. Se lasci vuoto non viene mostrata.
+            </p>
+            <div class="settings-field">
+                <label>Titolo sezione</label>
+                <input type="text" id="bizAboutTitle" value="${_escHtml(_tenantVal('about_title', ''))}" class="settings-input" placeholder="Es. Chi sono, Il nostro studio, Su di noi...">
+            </div>
+            <div class="settings-field">
+                <label>Testo di presentazione</label>
+                <textarea id="bizAboutText" class="settings-input" rows="5" placeholder="Scrivi qualcosa su di te o sulla tua attività. Puoi andare a capo per creare paragrafi separati.">${_escHtml(_tenantVal('about_text', ''))}</textarea>
+            </div>
+            <div class="settings-field">
+                <label>Foto</label>
+                <div class="logo-upload-area" id="aboutImageUploadArea">
+                    ${_tenantVal('about_image', '')
+                        ? `<img src="${_escHtml(_tenantVal('about_image', ''))}" alt="About" class="logo-upload-preview" id="aboutPreviewImg">`
+                        : `<div class="logo-upload-placeholder" id="aboutPlaceholder">
+                            <span style="font-size:2rem;">📷</span>
+                            <span>Carica una foto (opzionale)</span>
+                           </div>`
+                    }
+                    <input type="file" id="bizAboutImageFile" accept="image/*" style="display:none;" onchange="_handleAboutImageUpload(event)">
+                    <input type="hidden" id="bizAboutImage" value="${_escHtml(_tenantVal('about_image', ''))}">
+                </div>
+                ${_tenantVal('about_image', '') ? `<button onclick="_removeAboutImage()" style="margin-top:0.4rem;font-size:0.8rem;color:#e74c3c;background:none;border:none;cursor:pointer;">Rimuovi foto</button>` : ''}
+            </div>
+        </div>
+
         <!-- Orari di apertura -->
         <div class="settings-card">
             <h4 class="settings-card-title">Orari di apertura</h4>
@@ -445,8 +476,9 @@ function renderSettingsPanel() {
         </button>
     `;
 
-    // Init logo upload drag & drop
+    // Init upload drag & drop
     _initLogoUpload();
+    _initAboutImageUpload();
     // Color preview live
     _updateColorPreview();
     document.getElementById('bizPrimaryColor')?.addEventListener('input', _updateColorPreview);
@@ -662,6 +694,82 @@ function _removeLogo() {
     showToast('Logo rimosso', 'success');
 }
 
+// ── About image upload ───────────────────────────────────────────────────────
+
+function _initAboutImageUpload() {
+    const area = document.getElementById('aboutImageUploadArea');
+    if (!area) return;
+    area.addEventListener('click', (e) => {
+        if (e.target.tagName === 'BUTTON') return;
+        document.getElementById('bizAboutImageFile').click();
+    });
+    area.addEventListener('dragover', (e) => { e.preventDefault(); area.classList.add('drag-over'); });
+    area.addEventListener('dragleave', () => area.classList.remove('drag-over'));
+    area.addEventListener('drop', (e) => {
+        e.preventDefault(); area.classList.remove('drag-over');
+        const file = e.dataTransfer?.files?.[0];
+        if (file && file.type.startsWith('image/')) _processAboutImage(file);
+    });
+}
+
+function _handleAboutImageUpload(event) {
+    const file = event.target.files?.[0];
+    if (file) _processAboutImage(file);
+}
+
+function _processAboutImage(file) {
+    if (file.size > 800 * 1024) { showToast('Immagine troppo grande (max 800 KB).', 'error'); return; }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const maxSize = 400;
+            let w = img.width, h = img.height;
+            if (w > maxSize || h > maxSize) {
+                if (w > h) { h = Math.round(h * maxSize / w); w = maxSize; }
+                else { w = Math.round(w * maxSize / h); h = maxSize; }
+            }
+            canvas.width = w; canvas.height = h;
+            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+            const resized = canvas.toDataURL('image/jpeg', 0.85);
+            document.getElementById('bizAboutImage').value = resized;
+            const area = document.getElementById('aboutImageUploadArea');
+            const placeholder = document.getElementById('aboutPlaceholder');
+            if (placeholder) placeholder.remove();
+            let preview = document.getElementById('aboutPreviewImg');
+            if (!preview) {
+                preview = document.createElement('img');
+                preview.id = 'aboutPreviewImg';
+                preview.className = 'logo-upload-preview';
+                area.insertBefore(preview, area.firstChild);
+            }
+            preview.src = resized;
+            showToast('Foto caricata!', 'success');
+        };
+        img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+}
+
+function _removeAboutImage() {
+    document.getElementById('bizAboutImage').value = '';
+    const preview = document.getElementById('aboutPreviewImg');
+    if (preview) preview.remove();
+    let placeholder = document.getElementById('aboutPlaceholder');
+    if (!placeholder) {
+        const area = document.getElementById('aboutImageUploadArea');
+        placeholder = document.createElement('div');
+        placeholder.id = 'aboutPlaceholder';
+        placeholder.className = 'logo-upload-placeholder';
+        placeholder.innerHTML = '<span style="font-size:2rem;">📷</span><span>Carica una foto (opzionale)</span>';
+        area.insertBefore(placeholder, area.firstChild);
+    }
+    const removeBtn = document.querySelector('button[onclick="_removeAboutImage()"]');
+    if (removeBtn) removeBtn.remove();
+    showToast('Foto rimossa', 'success');
+}
+
 // ── Payments toggle helper ────────────────────────────────────────────────────
 
 function _togglePaymentsPreview(enabled) {
@@ -744,6 +852,10 @@ async function saveAllSettings() {
         logo_url:      document.getElementById('bizLogoUrl')?.value?.trim() || '',
         primary_color: document.getElementById('bizPrimaryColor')?.value || '#4F46E5',
         header_color:  document.getElementById('bizHeaderColor')?.value || '#1e1b4b',
+        // Chi sono
+        about_title:   document.getElementById('bizAboutTitle')?.value?.trim() || '',
+        about_text:    document.getElementById('bizAboutText')?.value?.trim() || '',
+        about_image:   document.getElementById('bizAboutImage')?.value || '',
         // Orari
         opening_time:     document.getElementById('sOpenTime')?.value || '09:00',
         closing_time:     document.getElementById('sCloseTime')?.value || '19:00',
