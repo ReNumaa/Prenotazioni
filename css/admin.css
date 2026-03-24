@@ -2,6 +2,8 @@
 
 .dashboard-section .container {
     max-width: 720px;
+    margin: 0 auto;
+    padding: 0 1.25rem;
 }
 
 .login-section {
@@ -4954,7 +4956,7 @@ canvas {
 
 /* ── Generic Admin Components ──────────────────────────────────────────────── */
 
-.admin-day-detail { margin-top: 1rem; }
+.admin-day-detail { margin-top: 1rem; max-width: 100%; }
 .admin-day-detail h4 { margin-bottom: 0.75rem; color: #333; font-size: 1.1rem; }
 
 .admin-slot-card {
