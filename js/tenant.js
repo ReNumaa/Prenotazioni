@@ -154,38 +154,9 @@ function _applyTenantConfig(tenant) {
         }
     }
 
-    // Sezione "Chi sono" (index.html)
-    const aboutSection = document.getElementById('aboutSection');
-    if (aboutSection && (tenant.about_title || tenant.about_text)) {
-        aboutSection.style.display = '';
-        const aboutTitle = document.getElementById('aboutTitle');
-        if (aboutTitle) aboutTitle.textContent = tenant.about_title || 'Chi sono';
-        const aboutText = document.getElementById('aboutText');
-        if (aboutText) {
-            // Supporta newline → paragrafi
-            aboutText.innerHTML = (tenant.about_text || '').split('\n').filter(p => p.trim())
-                .map(p => `<p>${_escHtml(p)}</p>`).join('');
-        }
-        // Contatti sotto il testo about
-        const aboutContact = document.getElementById('aboutContact');
-        if (aboutContact) {
-            let contactHtml = '';
-            if (tenant.phone) contactHtml += `<a href="tel:${_escHtml(tenant.phone)}" class="about-contact-item">📞 ${_escHtml(tenant.phone)}</a>`;
-            if (tenant.email) contactHtml += `<a href="mailto:${_escHtml(tenant.email)}" class="about-contact-item">📧 ${_escHtml(tenant.email)}</a>`;
-            if (tenant.address) {
-                const addrLink = tenant.maps_url ? `<a href="${_escHtml(tenant.maps_url)}" target="_blank" rel="noopener" class="about-contact-item">📍 ${_escHtml(tenant.address)}</a>` : `<span class="about-contact-item">📍 ${_escHtml(tenant.address)}</span>`;
-                contactHtml += addrLink;
-            }
-            aboutContact.innerHTML = contactHtml;
-        }
-        // Immagine about
-        const aboutImageWrap = document.getElementById('aboutImageWrap');
-        const aboutImage = document.getElementById('aboutImage');
-        if (aboutImageWrap && aboutImage && tenant.about_image) {
-            aboutImage.src = tenant.about_image;
-            aboutImage.alt = tenant.about_title || tenant.name || '';
-            aboutImageWrap.style.display = '';
-        }
+    // Link "Chi sono" — mostra solo se l'admin ha compilato il testo
+    if (tenant.about_title || tenant.about_text) {
+        document.querySelectorAll('.nav-about-link').forEach(el => { el.style.display = ''; });
     }
 
     // PWA manifest dinamico per tenant
@@ -231,6 +202,7 @@ function rewriteTenantLinks() {
     document.querySelectorAll('a[href="login.html"]').forEach(a => a.href = 'login.html#' + TENANT_SLUG);
     document.querySelectorAll('a[href="prenotazioni.html"]').forEach(a => a.href = 'prenotazioni.html#' + TENANT_SLUG);
     document.querySelectorAll('a[href="admin.html"]').forEach(a => a.href = 'admin.html#' + TENANT_SLUG);
+    document.querySelectorAll('a[href="about.html"]').forEach(a => a.href = 'about.html#' + TENANT_SLUG);
 }
 
 // ── Check tenant billing status ───────────────────────────────────────────────

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; connect-src 'self' https://*.supabase.co wss://*.supabase.co; img-src 'self' data: https: blob:; font-src 'self'; frame-src 'self' https://accounts.google.com; form-action 'self'">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <link rel="manifest" href="manifest.json?v=1">
+    <meta name="theme-color" content="#4F46E5">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Chi sono">
+    <title>Chi sono</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👤</text></svg>">
+    <link rel="stylesheet" href="css/style.css?v=1">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <a href="/" class="nav-brand-link"><span class="brand-text">Prenotazioni</span></a>
+            </div>
+            <div class="nav-right">
+                <ul class="nav-desktop-links">
+                    <li><a href="/">Calendario</a></li>
+                    <li><a href="about.html" class="active nav-about-link">Chi sono</a></li>
+                </ul>
+                <div id="navLoginLink" style="display:flex; align-items:center;">
+                    <a href="login.html" class="nav-login-btn">Accedi</a>
+                </div>
+                <div id="navUserMenu" style="display:none; align-items:center; gap:0.4rem;">
+                    <span id="navUserName" class="nav-user-name"></span>
+                    <button id="navLogoutBtn" class="nav-logout-btn">Esci</button>
+                </div>
+                <button class="nav-hamburger" id="navHamburger" aria-label="Menu">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="about-page">
+        <div class="container">
+            <!-- Hero con immagine -->
+            <div id="aboutHero" class="about-hero" style="display:none;">
+                <img id="aboutHeroImg" class="about-hero-img" alt="">
+            </div>
+
+            <!-- Contenuto -->
+            <div class="about-main">
+                <h1 id="aboutTitle" class="about-page-title">Chi sono</h1>
+                <div id="aboutText" class="about-page-text"></div>
+            </div>
+
+            <!-- Contatti -->
+            <div id="aboutContactCard" class="about-contact-card" style="display:none;">
+                <h3 class="about-contact-title">Contatti</h3>
+                <div id="aboutContacts" class="about-contacts-grid"></div>
+            </div>
+
+            <!-- CTA -->
+            <div class="about-cta">
+                <a href="/" class="about-cta-btn">Prenota un appuntamento</a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Sidebar -->
+    <div class="nav-sidebar-overlay" id="navSidebarOverlay" onclick="toggleNavMenu()"></div>
+    <nav class="nav-sidebar" id="navSidebar">
+        <div class="nav-sidebar-header">
+            <span class="nav-sidebar-title">Menu</span>
+            <button class="nav-sidebar-close" onclick="toggleNavMenu()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+        <ul class="nav-sidebar-links">
+            <li><a href="/">Calendario</a></li>
+            <li><a href="about.html" class="nav-about-link">Chi sono</a></li>
+        </ul>
+    </nav>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 &mdash; <a href="privacy.html" style="color:rgba(255,255,255,0.6);">Privacy e Termini</a></p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.99.1/dist/umd/supabase.min.js" integrity="sha384-nBSomYN4UWX4we7Pw5GsQDkjtwLh2Wde+3szWl5Lzf0zuN9XncHIZLNoucos4C7f" crossorigin="anonymous"></script>
+    <script src="js/supabase-client.js?v=1"></script>
+    <script src="js/ui.js?v=1"></script>
+    <script src="js/data.js?v=1"></script>
+    <script src="js/tenant.js?v=1"></script>
+    <script src="js/auth.js?v=1"></script>
+    <script>
+        (async () => {
+            if (!TENANT_SLUG) { window.location.href = 'index.html'; return; }
+            const tenant = await resolveTenant();
+            if (!tenant) { window.location.href = 'index.html'; return; }
+
+            // Se non c'è contenuto about, redirect al calendario
+            if (!tenant.about_title && !tenant.about_text) {
+                window.location.href = 'index.html#' + TENANT_SLUG;
+                return;
+            }
+
+            await initAuth();
+            rewriteTenantLinks();
+
+            // Popola la pagina
+            document.title = (tenant.about_title || 'Chi sono') + ' — ' + (tenant.name || '');
+            document.getElementById('aboutTitle').textContent = tenant.about_title || 'Chi sono';
+
+            // Testo con paragrafi
+            const textEl = document.getElementById('aboutText');
+            if (textEl && tenant.about_text) {
+                textEl.innerHTML = tenant.about_text.split('\n').filter(p => p.trim())
+                    .map(p => `<p>${_escHtml(p)}</p>`).join('');
+            }
+
+            // Immagine hero
+            if (tenant.about_image) {
+                document.getElementById('aboutHero').style.display = '';
+                document.getElementById('aboutHeroImg').src = tenant.about_image;
+                document.getElementById('aboutHeroImg').alt = tenant.about_title || tenant.name || '';
+            }
+
+            // Contatti
+            const contacts = [];
+            if (tenant.phone) contacts.push({ icon: '📞', label: 'Telefono', value: tenant.phone, href: 'tel:' + tenant.phone });
+            if (tenant.email) contacts.push({ icon: '📧', label: 'Email', value: tenant.email, href: 'mailto:' + tenant.email });
+            if (tenant.address) contacts.push({ icon: '📍', label: 'Indirizzo', value: tenant.address, href: tenant.maps_url || null });
+
+            if (contacts.length > 0) {
+                document.getElementById('aboutContactCard').style.display = '';
+                document.getElementById('aboutContacts').innerHTML = contacts.map(c => `
+                    <${c.href ? `a href="${_escHtml(c.href)}" target="_blank" rel="noopener"` : 'div'} class="about-contact-item-card">
+                        <span class="about-contact-icon">${c.icon}</span>
+                        <div>
+                            <div class="about-contact-label">${c.label}</div>
+                            <div class="about-contact-value">${_escHtml(c.value)}</div>
+                        </div>
+                    </${c.href ? 'a' : 'div'}>
+                `).join('');
+            }
+
+            // CTA link
+            document.querySelector('.about-cta-btn')?.setAttribute('href', 'index.html#' + TENANT_SLUG);
+        })();
+    </script>
+</body>
+</html>
