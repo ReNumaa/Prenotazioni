@@ -1,7 +1,7 @@
 /* Admin Styles */
 
 .dashboard-section .container {
-    max-width: 620px;
+    max-width: 720px;
 }
 
 .login-section {
@@ -4959,11 +4959,11 @@ canvas {
 
 .admin-slot-card {
     background: #fff;
-    border-radius: 10px;
-    padding: 0.75rem 1rem;
-    margin-bottom: 0.75rem;
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 0.85rem;
     border-left: 4px solid #ccc;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
 }
 .admin-slot-card.servizio-1 { border-left-color: #2ecc71; }
 .admin-slot-card.servizio-2 { border-left-color: #3498db; }
@@ -5020,9 +5020,9 @@ canvas {
 }
 .admin-client-list { display: flex; flex-direction: column; gap: 0.5rem; }
 .admin-client-card {
-    display: flex; align-items: center; gap: 0.75rem;
-    padding: 0.75rem 1rem; background: #fff; border-radius: 10px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    display: flex; align-items: center; gap: 0.85rem;
+    padding: 0.9rem 1.15rem; background: #fff; border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
 }
 .admin-client-avatar {
     width: 40px; height: 40px; border-radius: 50%;
@@ -5055,10 +5055,10 @@ canvas {
 
 .settings-card {
     background: #fff;
-    border-radius: 12px;
-    padding: 1.25rem;
-    margin-bottom: 1rem;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    border-radius: 14px;
+    padding: 1.5rem;
+    margin-bottom: 1.1rem;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
 }
 .settings-card-title {
     font-size: 0.95rem;
@@ -5260,18 +5260,20 @@ textarea.settings-input {
 
 /* ── Mobile responsive for admin ──────────────────────────────────────────── */
 @media (max-width: 600px) {
-    .dashboard-section .container { padding: 0 0.75rem; }
+    .dashboard-section .container { padding: 0 1rem; max-width: 100%; }
     .admin-tabs { gap: 0; overflow-x: auto; -webkit-overflow-scrolling: touch; flex-wrap: nowrap; padding-bottom: 0.25rem; }
-    .admin-tab { font-size: 0.75rem; padding: 0.5rem 0.6rem; white-space: nowrap; flex-shrink: 0; }
-    .settings-card { padding: 1rem; }
+    .admin-tab { font-size: 0.8rem; padding: 0.55rem 0.7rem; white-space: nowrap; flex-shrink: 0; }
+    .settings-card { padding: 1.25rem; margin-left: 0; margin-right: 0; }
     .settings-row { flex-direction: column; }
-    .admin-booking-row { font-size: 0.8rem; }
+    .admin-slot-card { padding: 0.9rem 1rem; margin-left: 0; margin-right: 0; }
+    .admin-booking-row { font-size: 0.85rem; padding: 0.5rem 0.6rem; }
     .admin-booking-name { min-width: 80px; }
     .admin-booking-contact { display: none; }
-    .admin-slot-header { font-size: 0.85rem; }
-    .admin-client-card { padding: 0.6rem 0.75rem; }
-    .schedule-day-tabs { gap: 0.25rem; }
-    .schedule-day-tab { padding: 0.4rem 0.3rem; min-width: 40px; }
+    .admin-slot-header { font-size: 0.9rem; }
+    .admin-client-card { padding: 0.85rem 1rem; margin-left: 0; margin-right: 0; }
+    .admin-client-list { gap: 0.6rem; }
+    .schedule-day-tabs { gap: 0.3rem; }
+    .schedule-day-tab { padding: 0.45rem 0.35rem; min-width: 42px; }
     .admin-day-name { font-size: 0.7rem; }
     .admin-calendar-controls { gap: 0.25rem; }
     .admin-calendar-controls h4 { font-size: 0.85rem; }
