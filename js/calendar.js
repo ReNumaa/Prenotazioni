@@ -210,10 +210,35 @@ function renderCalendar() {
         calendarGrid.appendChild(header);
     });
 
-    // Create time slots rows
-    TIME_SLOTS.forEach(timeSlot => {
-        // Time label
-        const timeLabel = createDiv('calendar-time', timeSlot);
+    // Collect all unique time slots from the configured schedule for this week
+    const overrides = BookingStorage.getScheduleOverrides();
+    const weekTimeSet = new Set();
+    weekDates.forEach(d => {
+        const daySlots = overrides[d.formatted] || [];
+        daySlots.forEach(s => weekTimeSet.add(s.time));
+    });
+    const weekTimes = [...weekTimeSet].sort();
+
+    if (weekTimes.length === 0) {
+        calendarGrid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:2rem;color:#999;">Nessun orario configurato per questa settimana.</div>';
+        // Keep headers
+        const headerRow = createDiv('calendar-header', '');
+        calendarGrid.prepend(headerRow);
+        weekDates.forEach(dateInfo => {
+            const header = createDiv('calendar-header', `<div>${dateInfo.dayName}</div><div style="font-size:0.85rem;opacity:0.8;">${dateInfo.displayDate}</div>`);
+            calendarGrid.appendChild(header);
+        });
+        return;
+    }
+
+    // Update grid columns based on number of days + 1 (time label)
+    calendarGrid.style.gridTemplateColumns = `auto repeat(${weekDates.length}, 1fr)`;
+
+    // Create time slots rows from actual configured slots
+    weekTimes.forEach(timeSlot => {
+        // Time label — show just start time for compact display
+        const startTime = timeSlot.split(' - ')[0];
+        const timeLabel = createDiv('calendar-time', `<div>${startTime}</div>`);
         calendarGrid.appendChild(timeLabel);
 
         // Day slots
@@ -440,7 +465,7 @@ function renderMobileSlots(dateInfo) {
     const scheduledSlots = overrides[dateInfo.formatted] || [];
 
     if (scheduledSlots.length === 0) {
-        slotsList.innerHTML = '<div style="text-align: center; color: #999; padding: 2rem;">Nessuna lezione programmata per questo giorno</div>';
+        slotsList.innerHTML = '<div style="text-align: center; color: #999; padding: 2rem;">Nessun appuntamento disponibile per questo giorno</div>';
         return;
     }
 
@@ -466,7 +491,7 @@ function renderMobileSlots(dateInfo) {
     });
 
     if (!slotsList.hasChildNodes()) {
-        slotsList.innerHTML = '<div style="text-align: center; color: #999; padding: 2rem;">Nessuna lezione disponibile per questo giorno</div>';
+        slotsList.innerHTML = '<div style="text-align: center; color: #999; padding: 2rem;">Nessun appuntamento disponibile per questo giorno</div>';
     }
 }
 
