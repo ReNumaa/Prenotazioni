@@ -146,8 +146,8 @@ function _setDynamicManifest(tenant) {
         theme_color: tenant.primary_color || '#4F46E5',
         lang: 'it',
         icons: [
-            { src: tenant.logo_url || './images/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any maskable' },
-            { src: tenant.logo_url || './images/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' },
+            { src: tenant.logo_url || './images/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+            { src: tenant.logo_url || './images/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
         ]
     };
     const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });

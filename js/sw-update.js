@@ -29,7 +29,7 @@
         safeReload();
     }
 
-    navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' }).then(reg => {
+    navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).then(reg => {
         // Controlla aggiornamenti una sola volta all'apertura dell'app
         reg.update();
 
