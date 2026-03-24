@@ -101,6 +101,24 @@ function _applyTenantConfig(tenant) {
         const brandText = document.querySelector('.brand-text');
         if (brandText) brandText.textContent = tenant.name;
     }
+    // Logo nella navbar
+    const brandLink = document.querySelector('.nav-brand-link');
+    if (brandLink) {
+        if (tenant.logo_url) {
+            // Sostituisci emoji con immagine logo
+            let logoImg = brandLink.querySelector('.nav-brand-logo');
+            if (!logoImg) {
+                logoImg = document.createElement('img');
+                logoImg.className = 'nav-brand-logo';
+                brandLink.insertBefore(logoImg, brandLink.firstChild);
+                // Nascondi l'emoji
+                const emoji = brandLink.childNodes[0];
+                if (emoji && emoji.nodeType === 3 && emoji.textContent.trim()) emoji.textContent = '';
+            }
+            logoImg.src = tenant.logo_url;
+            logoImg.alt = tenant.name || 'Logo';
+        }
+    }
     if (tenant.primary_color && tenant.primary_color !== '#4F46E5') {
         document.documentElement.style.setProperty('--primary-cyan', tenant.primary_color);
         document.documentElement.style.setProperty('--primary-cyan-dark', _darkenColor(tenant.primary_color, 15));

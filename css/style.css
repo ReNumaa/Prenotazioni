@@ -1917,6 +1917,17 @@ body.nav-open {
     gap: 0.4rem;
 }
 .brand-text { font-size: 1.1rem; }
+.nav-brand-logo {
+    height: 36px;
+    width: auto;
+    border-radius: 6px;
+    object-fit: contain;
+    display: block;
+}
+@media (max-width: 768px) {
+    .nav-brand-logo { height: 30px; }
+    .brand-text { font-size: 0.95rem; }
+}
 
 /* ── Login logo text ────────────────────────────────────────────────────────── */
 .login-logo-text {
