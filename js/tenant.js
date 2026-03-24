@@ -119,6 +119,12 @@ function _applyTenantConfig(tenant) {
             logoImg.alt = tenant.name || 'Logo';
         }
     }
+    // Rimuovi eventuali emoji rimaste nel brand link
+    if (brandLink) {
+        brandLink.childNodes.forEach(node => {
+            if (node.nodeType === 3 && node.textContent.trim()) node.textContent = ' ';
+        });
+    }
     if (tenant.primary_color && tenant.primary_color !== '#4F46E5') {
         document.documentElement.style.setProperty('--primary-cyan', tenant.primary_color);
         document.documentElement.style.setProperty('--primary-cyan-dark', _darkenColor(tenant.primary_color, 15));
