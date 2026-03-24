@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Admin — Gestione Tenant</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👑</text></svg>">
+    <link rel="stylesheet" href="css/style.css?v=1">
+    <link rel="stylesheet" href="css/admin.css?v=1">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <a href="super-admin.html" class="nav-brand-link">👑 <span class="brand-text">Super Admin</span></a>
+            </div>
+            <div class="nav-right">
+                <div id="navUserMenu" style="display:flex; align-items:center; gap:0.4rem;">
+                    <span id="navUserName" class="nav-user-name">Admin</span>
+                    <button id="navLogoutBtn" class="nav-logout-btn" onclick="logoutUser().then(()=>location.href='index.html')">Esci</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <section class="dashboard-section">
+        <div class="container" style="max-width:800px;">
+            <h2 style="margin:1.5rem 0 1rem;">Gestione Attività</h2>
+
+            <!-- Create new tenant -->
+            <div class="settings-card" style="margin-bottom:1.5rem;">
+                <h4 class="settings-card-title">Crea nuova attività</h4>
+                <div class="settings-row">
+                    <div class="settings-field" style="flex:1;">
+                        <label>Nome attività *</label>
+                        <input type="text" id="newTenantName" class="settings-input" placeholder="Es. Barbiere Mario">
+                    </div>
+                    <div class="settings-field" style="flex:1;">
+                        <label>Slug (URL) *</label>
+                        <input type="text" id="newTenantSlug" class="settings-input" placeholder="barbiere-mario">
+                    </div>
+                </div>
+                <div class="settings-field">
+                    <label>Email admin (proprietario) *</label>
+                    <input type="email" id="newTenantAdminEmail" class="settings-input" placeholder="mario@email.com">
+                    <p style="font-size:0.8rem;color:#888;margin-top:0.3rem;">
+                        L'admin riceverà un'email di invito per impostare la password e accedere al suo pannello.
+                    </p>
+                </div>
+                <button onclick="createTenantAndInvite()" class="settings-btn-primary" style="margin-top:0.5rem;">
+                    Crea attività e invia invito
+                </button>
+            </div>
+
+            <!-- Tenant list -->
+            <div id="tenantList"></div>
+        </div>
+    </section>
+
+    <!-- Invite modal (for existing tenants) -->
+    <div id="inviteModal" class="modal-overlay" style="display:none;" onclick="if(event.target===this)closeInviteModal()">
+        <div class="modal-box" style="max-width:450px;">
+            <button class="modal-close" onclick="closeInviteModal()">&#10005;</button>
+            <h3 style="margin-bottom:1rem;">Invita admin</h3>
+            <p style="color:#666;font-size:0.9rem;margin-bottom:1rem;" id="inviteModalTenantName"></p>
+            <div class="settings-field">
+                <label>Email del nuovo admin</label>
+                <input type="email" id="inviteEmail" class="settings-input" placeholder="nome@email.com">
+            </div>
+            <div class="settings-field">
+                <label>Ruolo</label>
+                <select id="inviteRole" class="settings-input">
+                    <option value="admin">Admin</option>
+                    <option value="staff">Staff (solo visualizzazione)</option>
+                </select>
+            </div>
+            <div id="inviteError" class="login-error" style="display:none;"></div>
+            <button onclick="sendInvite()" class="settings-btn-primary" style="width:100%;margin-top:0.5rem;">
+                Invia invito
+            </button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.99.1/dist/umd/supabase.min.js" integrity="sha384-nBSomYN4UWX4we7Pw5GsQDkjtwLh2Wde+3szWl5Lzf0zuN9XncHIZLNoucos4C7f" crossorigin="anonymous"></script>
+    <script src="js/supabase-client.js?v=1"></script>
+    <script src="js/ui.js?v=1"></script>
+    <script src="js/data.js?v=1"></script>
+    <script src="js/auth.js?v=1"></script>
+    <script>
+        let _allTenants = [];
+        let _inviteTenantId = null;
+        let _inviteTenantSlug = null;
+
+        // Auto-generate slug from name
+        document.getElementById('newTenantName')?.addEventListener('input', (e) => {
+            const slug = e.target.value.toLowerCase()
+                .replace(/[àáâã]/g, 'a').replace(/[èéêë]/g, 'e').replace(/[ìíîï]/g, 'i')
+                .replace(/[òóôõ]/g, 'o').replace(/[ùúûü]/g, 'u')
+                .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+            document.getElementById('newTenantSlug').value = slug;
+        });
+
+        // ── Create tenant + invite admin ─────────────────────────────────────
+
+        async function createTenantAndInvite() {
+            const name = document.getElementById('newTenantName')?.value?.trim();
+            const slug = document.getElementById('newTenantSlug')?.value?.trim();
+            const adminEmail = document.getElementById('newTenantAdminEmail')?.value?.trim();
+
+            if (!name || !slug) { showToast('Nome e slug sono obbligatori.', 'error'); return; }
+            if (!adminEmail) { showToast('Inserisci l\'email dell\'admin.', 'error'); return; }
+            if (!/^[a-z0-9-]+$/.test(slug)) { showToast('Lo slug può contenere solo lettere minuscole, numeri e trattini.', 'error'); return; }
+
+            if (typeof supabaseClient === 'undefined') {
+                // ── Demo mode ────────────────────────────────────────────────
+                const tenant = {
+                    id: 'demo-' + slug, slug, name,
+                    description: '', phone: '', email: adminEmail, address: '',
+                    maps_url: '', logo_url: '', primary_color: '#4F46E5',
+                    slot_duration: '60 minuti', booking_notice: '',
+                    services: [
+                        { id: 'servizio-1', name: 'Appuntamento Base', price: 25, capacity: 1, color: '#2ecc71', active: true },
+                        { id: 'servizio-2', name: 'Appuntamento Standard', price: 35, capacity: 1, color: '#3498db', active: true },
+                    ],
+                    active: true, created_at: new Date().toISOString(),
+                    plan: 'trial',
+                    trial_ends_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+                    pending_admin_email: adminEmail,
+                };
+                _lsSet('demo_tenant_' + slug, JSON.stringify(tenant));
+                const list = _lsGetJSON('demo_tenants', []);
+                list.push({ slug, name, email: adminEmail, created_at: tenant.created_at, id: tenant.id });
+                _lsSet('demo_tenants', JSON.stringify(list));
+                _clearForm();
+                showToast(`"${name}" creato! In demo l'admin accede direttamente da admin.html#${slug}`, 'success', 6000);
+                loadTenants();
+                return;
+            }
+
+            // ── Supabase mode ────────────────────────────────────────────────
+
+            // 1. Crea il tenant
+            const { data: tenant, error } = await supabaseClient.from('tenants')
+                .insert({ slug, name, email: adminEmail }).select().single();
+            if (error) {
+                if (error.message.includes('duplicate')) showToast('Slug già in uso. Scegline un altro.', 'error');
+                else showToast('Errore: ' + error.message, 'error');
+                return;
+            }
+
+            // 2. Salva l'email come "pending admin" nella tabella tenant_invites
+            await supabaseClient.from('tenant_invites').insert({
+                tenant_id: tenant.id,
+                email: adminEmail.toLowerCase(),
+                role: 'owner',
+            });
+
+            // 3. Invia l'invito via Supabase Auth
+            const redirectUrl = window.location.origin + '/admin.html#' + slug;
+            const { error: inviteErr } = await supabaseClient.auth.admin.inviteUserByEmail(adminEmail, {
+                redirectTo: redirectUrl,
+                data: { tenant_slug: slug, tenant_id: tenant.id, role: 'owner' }
+            });
+
+            if (inviteErr) {
+                // L'utente potrebbe già esistere — prova a linkarlo direttamente
+                const { data: profile } = await supabaseClient.from('profiles')
+                    .select('id').eq('email', adminEmail.toLowerCase()).maybeSingle();
+                if (profile?.id) {
+                    await supabaseClient.from('tenant_members').insert({
+                        tenant_id: tenant.id, user_id: profile.id, role: 'owner'
+                    });
+                    showToast(`"${name}" creato! L'utente esiste già ed è stato collegato come admin.`, 'success', 5000);
+                } else {
+                    showToast(`"${name}" creato, ma invito email fallito: ${inviteErr.message}. L'admin potrà registrarsi manualmente.`, 'warning', 8000);
+                }
+            } else {
+                showToast(`"${name}" creato! Invito inviato a ${adminEmail}`, 'success', 5000);
+            }
+
+            _clearForm();
+            loadTenants();
+        }
+
+        function _clearForm() {
+            document.getElementById('newTenantName').value = '';
+            document.getElementById('newTenantSlug').value = '';
+            document.getElementById('newTenantAdminEmail').value = '';
+        }
+
+        // ── Invite modal (for existing tenants) ─────────────────────────────
+
+        function openInviteModal(tenantId, tenantSlug, tenantName) {
+            _inviteTenantId = tenantId;
+            _inviteTenantSlug = tenantSlug;
+            document.getElementById('inviteModalTenantName').textContent = 'Invita un admin per: ' + tenantName;
+            document.getElementById('inviteEmail').value = '';
+            document.getElementById('inviteError').style.display = 'none';
+            document.getElementById('inviteModal').style.display = 'flex';
+        }
+
+        function closeInviteModal() {
+            document.getElementById('inviteModal').style.display = 'none';
+            _inviteTenantId = null;
+            _inviteTenantSlug = null;
+        }
+
+        async function sendInvite() {
+            const email = document.getElementById('inviteEmail')?.value?.trim();
+            const role = document.getElementById('inviteRole')?.value || 'admin';
+            const errEl = document.getElementById('inviteError');
+            errEl.style.display = 'none';
+
+            if (!email) { errEl.textContent = 'Inserisci un\'email.'; errEl.style.display = 'block'; return; }
+            if (!_inviteTenantId) return;
+
+            if (typeof supabaseClient === 'undefined') {
+                showToast('In demo mode l\'invito non invia email. L\'admin accede da admin.html#' + _inviteTenantSlug, 'info', 5000);
+                closeInviteModal();
+                return;
+            }
+
+            // Salva invito pendente
+            await supabaseClient.from('tenant_invites').insert({
+                tenant_id: _inviteTenantId,
+                email: email.toLowerCase(),
+                role: role,
+            });
+
+            // Prova a invitare via Supabase Auth
+            const redirectUrl = window.location.origin + '/admin.html#' + _inviteTenantSlug;
+            const { error } = await supabaseClient.auth.admin.inviteUserByEmail(email, {
+                redirectTo: redirectUrl,
+                data: { tenant_slug: _inviteTenantSlug, tenant_id: _inviteTenantId, role }
+            });
+
+            if (error) {
+                // Utente già registrato? Collega direttamente
+                const { data: profile } = await supabaseClient.from('profiles')
+                    .select('id').eq('email', email.toLowerCase()).maybeSingle();
+                if (profile?.id) {
+                    await supabaseClient.from('tenant_members').upsert({
+                        tenant_id: _inviteTenantId, user_id: profile.id, role
+                    });
+                    showToast(`Utente collegato come ${role}!`, 'success');
+                } else {
+                    errEl.textContent = 'Invito fallito: ' + error.message;
+                    errEl.style.display = 'block';
+                    return;
+                }
+            } else {
+                showToast(`Invito inviato a ${email}!`, 'success');
+            }
+
+            closeInviteModal();
+        }
+
+        // ── Load & render tenants ────────────────────────────────────────────
+
+        async function loadTenants() {
+            if (typeof supabaseClient !== 'undefined') {
+                const { data } = await supabaseClient.from('tenants').select('*').order('created_at', { ascending: false });
+                _allTenants = data || [];
+            } else {
+                _allTenants = _lsGetJSON('demo_tenants', []);
+            }
+            renderTenantList();
+        }
+
+        function renderTenantList() {
+            const container = document.getElementById('tenantList');
+            if (!container) return;
+
+            if (_allTenants.length === 0) {
+                container.innerHTML = '<p style="text-align:center;color:#999;padding:2rem;">Nessuna attività creata. Crea la prima qui sopra!</p>';
+                return;
+            }
+
+            container.innerHTML = _allTenants.map(t => {
+                const plan = t.plan || 'trial';
+                const planBadge = {
+                    trial: { label: 'Prova', bg: '#eff6ff', color: '#2563eb' },
+                    active: { label: 'Attivo', bg: '#f0fdf4', color: '#059669' },
+                    past_due: { label: 'Ritardo', bg: '#fffbeb', color: '#d97706' },
+                    cancelled: { label: 'Cancellato', bg: '#fef2f2', color: '#dc2626' },
+                    expired: { label: 'Scaduto', bg: '#fef2f2', color: '#dc2626' },
+                }[plan] || { label: plan, bg: '#f3f4f6', color: '#666' };
+
+                let trialInfo = '';
+                if (plan === 'trial' && t.trial_ends_at) {
+                    const days = Math.max(0, Math.ceil((new Date(t.trial_ends_at) - new Date()) / 86400000));
+                    trialInfo = `<span style="font-size:0.7rem;color:#888;"> (${days}g)</span>`;
+                }
+
+                return `
+                <div class="admin-client-card" style="margin-bottom:0.75rem;">
+                    <div class="admin-client-avatar" style="background:${t.primary_color || '#4F46E5'}">${(t.name || 'T')[0].toUpperCase()}</div>
+                    <div class="admin-client-info">
+                        <div class="admin-client-name">
+                            ${_escHtml(t.name)}
+                            <span style="font-size:0.7rem;padding:0.1rem 0.4rem;border-radius:6px;background:${planBadge.bg};color:${planBadge.color};font-weight:600;margin-left:0.4rem;">${planBadge.label}</span>
+                            ${trialInfo}
+                        </div>
+                        <div class="admin-client-detail">
+                            ${_escHtml(t.slug)} ${t.email ? ' · ' + _escHtml(t.email) : ''}
+                        </div>
+                    </div>
+                    <div style="display:flex;gap:0.4rem;flex-wrap:wrap;">
+                        <a href="index.html#${t.slug}" target="_blank" class="settings-btn-primary" style="text-decoration:none;font-size:0.75rem;padding:0.35rem 0.6rem;">Sito</a>
+                        <a href="admin.html#${t.slug}" target="_blank" class="settings-btn-primary" style="text-decoration:none;font-size:0.75rem;padding:0.35rem 0.6rem;background:#6366f1;">Admin</a>
+                        <button onclick="openInviteModal('${t.id}','${t.slug}','${_escHtml(t.name)}')" class="settings-btn-primary" style="font-size:0.75rem;padding:0.35rem 0.6rem;background:#059669;">Invita</button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        // ── Toggle tenant active/inactive ────────────────────────────────────
+
+        async function toggleTenantActive(tenantId, currentActive) {
+            if (typeof supabaseClient !== 'undefined') {
+                await supabaseClient.from('tenants').update({ active: !currentActive }).eq('id', tenantId);
+            }
+            showToast(currentActive ? 'Attività disattivata' : 'Attività riattivata', 'success');
+            loadTenants();
+        }
+
+        // ── Init ─────────────────────────────────────────────────────────────
+        (async () => {
+            await initAuth();
+            loadTenants();
+        })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <script>if(location.pathname.endsWith('/index.html'))location.replace(location.href.replace('/index.html','/'))</script>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; connect-src 'self' https://*.supabase.co wss://*.supabase.co; img-src 'self' data: https:; font-src 'self'; frame-src 'self' https://accounts.google.com; form-action 'self'">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <link rel="manifest" href="manifest.json?v=1">
+    <meta name="theme-color" content="#4F46E5">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Prenotazioni">
+    <title>Prenota Appuntamento</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📅</text></svg>">
+    <link rel="stylesheet" href="css/style.css?v=1">
+    <link rel="stylesheet" href="css/login.css?v=1">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <a href="/" class="nav-brand-link">📅 <span class="brand-text">Prenotazioni</span></a>
+            </div>
+            <div class="nav-right">
+                <ul class="nav-desktop-links">
+                    <li><a href="/" class="active">Calendario</a></li>
+                </ul>
+                <div id="navLoginLink" style="display:flex; align-items:center;">
+                    <a href="login.html" class="nav-login-btn">Accedi</a>
+                </div>
+                <div id="navUserMenu" style="display:none; align-items:center; gap:0.4rem;">
+                    <span id="navUserName" class="nav-user-name"></span>
+                    <button id="navLogoutBtn" class="nav-logout-btn">Esci</button>
+                </div>
+                <button class="nav-hamburger" id="navHamburger" aria-label="Menu">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="hero-name" id="heroName">Prenota il tuo Appuntamento</h1>
+                <p class="hero-role" id="heroDescription">Scegli data, orario e servizio</p>
+                <div class="hero-info">
+                    <div class="hero-info-item" id="heroDuration">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        <span>60 minuti</span>
+                    </div>
+                    <div class="hero-info-item" id="heroAddress" style="display:none;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                        <span id="heroAddressText"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section id="calendario" class="calendar-section">
+        <div class="container">
+            <div class="calendar-controls">
+                <button id="prevWeek" class="btn-control">&larr; Settimana Precedente</button>
+                <h3 id="currentWeek">Settimana Corrente</h3>
+                <button id="nextWeek" class="btn-control">Settimana Successiva &rarr;</button>
+            </div>
+
+            <div id="calendar" class="calendar-grid"></div>
+
+            <div class="mobile-calendar">
+                <div class="mobile-week-nav">
+                    <button id="mobilePrevWeek" class="mobile-week-btn" disabled>&#8592; Prec.</button>
+                    <span class="mobile-week-label" id="mobileWeekLabel"></span>
+                    <button id="mobileNextWeek" class="mobile-week-btn">Succ. &#8594;</button>
+                </div>
+                <div class="mobile-day-selector" id="mobileDaySelector"></div>
+                <div class="mobile-slots-list" id="mobileSlotsList"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Booking Modal -->
+    <div id="bookingModal" class="modal-overlay" style="display: none;" onclick="handleModalOverlayClick(event)">
+        <div class="modal-box">
+            <button class="modal-close" onclick="closeBookingModal()">&#10005;</button>
+            <div class="modal-slot-info" id="modalSlotInfo">
+                <div class="modal-slot-header">
+                    <div class="modal-slot-badge" id="modalSlotTypeBadge"></div>
+                    <p class="modal-spots" id="modalSlotSpots"></p>
+                </div>
+                <div class="modal-slot-day-row">
+                    <h3 id="modalSlotDay"></h3>
+                    <p class="modal-slot-time" id="modalSlotTime"></p>
+                </div>
+            </div>
+
+            <div id="loginPrompt" class="login-prompt" style="display: none;">
+                <p class="login-prompt-text">Per prenotare devi accedere al tuo account.</p>
+                <a href="login.html" class="btn-primary" style="display:block; text-align:center; text-decoration:none;">Accedi / Registrati</a>
+            </div>
+
+            <form id="bookingForm" class="booking-form">
+                <div id="bookingUserFields">
+                    <div class="form-group">
+                        <label for="name">Nome Completo *</label>
+                        <input type="text" id="name" name="name">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email *</label>
+                        <input type="email" id="email" name="email">
+                    </div>
+                    <div class="form-group">
+                        <label for="whatsapp">Telefono *</label>
+                        <input type="tel" id="whatsapp" name="whatsapp">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="notes">Note (opzionale)</label>
+                    <textarea id="notes" name="notes" rows="2"></textarea>
+                </div>
+                <button type="submit" class="btn-primary">Conferma Prenotazione</button>
+            </form>
+
+            <div id="confirmationMessage" class="confirmation-message" style="display: none;"></div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 Sistema di Prenotazione Appuntamenti &mdash; <a href="privacy.html" style="color:rgba(255,255,255,0.6);">Privacy e Termini</a></p>
+        </div>
+    </footer>
+
+    <!-- Profile Modal -->
+    <div id="profileModal" class="modal-overlay" style="display:none;" onclick="if(event.target===this)closeProfileModal()">
+        <div class="modal-box profile-modal-box">
+            <button class="modal-close" onclick="closeProfileModal()">&#10005;</button>
+            <h3 id="profileUserName" class="profile-modal-title"></h3>
+            <div class="profile-tabs">
+                <button class="profile-tab-btn active" data-tab="upcoming" onclick="renderProfileTab('upcoming')">Prossimi</button>
+                <button class="profile-tab-btn" data-tab="past" onclick="renderProfileTab('past')">Passati</button>
+            </div>
+            <div id="profileBookingsList" class="profile-bookings-list"></div>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="nav-sidebar-overlay" id="navSidebarOverlay" onclick="toggleNavMenu()"></div>
+    <nav class="nav-sidebar" id="navSidebar">
+        <div class="nav-sidebar-header">
+            <span class="nav-sidebar-title">Menu</span>
+            <button class="nav-sidebar-close" onclick="toggleNavMenu()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+        <ul class="nav-sidebar-links">
+            <li><a href="/">Calendario</a></li>
+        </ul>
+    </nav>
+
+    <script>
+        (function () {
+            var vp = document.querySelector('meta[name="viewport"]');
+            if (!vp) return;
+            document.addEventListener('touchstart', function (e) {
+                var tag = e.target.tagName;
+                if (tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA') {
+                    vp.setAttribute('content', 'width=device-width, initial-scale=1, maximum-scale=1');
+                }
+            }, { passive: true });
+            document.addEventListener('focusout', function (e) {
+                var tag = e.target.tagName;
+                if (tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA') {
+                    setTimeout(function () { vp.setAttribute('content', 'width=device-width, initial-scale=1'); }, 300);
+                }
+            });
+        }());
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.99.1/dist/umd/supabase.min.js" integrity="sha384-nBSomYN4UWX4we7Pw5GsQDkjtwLh2Wde+3szWl5Lzf0zuN9XncHIZLNoucos4C7f" crossorigin="anonymous"></script>
+    <script src="js/supabase-client.js?v=1"></script>
+    <script src="js/ui.js?v=1"></script>
+    <script src="js/data.js?v=1"></script>
+    <script src="js/tenant.js?v=1"></script>
+    <script src="js/calendar.js?v=1"></script>
+    <script src="js/booking.js?v=1"></script>
+    <script src="js/auth.js?v=1"></script>
+    <script src="js/admin-settings.js?v=1"></script>
+    <script src="js/push.js?v=1"></script>
+    <script>
+        if (!TENANT_SLUG) { showLandingPage(); }
+        else {
+        if (typeof renderCalendar === 'function') renderCalendar();
+        if (typeof renderMobileCalendar === 'function') renderMobileCalendar();
+
+        (async function () {
+            await resolveTenant();
+            // Check if tenant is accessible (billing check)
+            if (!isTenantAccessible()) {
+                // Admin can still access even if expired
+                const isAdminPage = window.location.pathname.includes('admin');
+                if (!isAdminPage) { showTenantExpiredPage(); return; }
+            }
+            await initAuth();
+            rewriteTenantLinks();
+            await Promise.all([
+                BookingStorage.syncFromSupabase(),
+                BookingStorage.syncAppSettingsFromSupabase(),
+            ]);
+            if (typeof renderCalendar === 'function') renderCalendar();
+            if (typeof renderMobileCalendar === 'function') renderMobileCalendar();
+
+            // Deep-link da notifica push
+            const _deepDate = new URLSearchParams(location.search).get('date');
+            if (_deepDate && typeof currentWeekOffset !== 'undefined') {
+                const _today = new Date(); _today.setHours(0,0,0,0);
+                const _target = new Date(_deepDate + 'T00:00:00');
+                const _todayMon = new Date(_today); _todayMon.setDate(_today.getDate() - ((_today.getDay()+6)%7));
+                const _targetMon = new Date(_target); _targetMon.setDate(_target.getDate() - ((_target.getDay()+6)%7));
+                currentWeekOffset = Math.round((_targetMon - _todayMon) / (7*24*60*60*1000));
+                if (typeof renderCalendar === 'function') renderCalendar();
+                if (typeof renderMobileCalendar === 'function') renderMobileCalendar();
+            }
+
+            if (typeof promptPushPermission === 'function' && getCurrentUser()) {
+                setTimeout(promptPushPermission, 1500);
+            }
+
+            // Realtime: aggiorna calendario
+            if (typeof supabaseClient !== 'undefined' && CURRENT_TENANT?.id) {
+                const _tid = CURRENT_TENANT.id;
+                const _rerender = () => {
+                    if (typeof renderCalendar === 'function') renderCalendar();
+                    if (typeof renderMobileCalendar === 'function') renderMobileCalendar();
+                };
+                supabaseClient.channel('bookings-rt')
+                    .on('postgres_changes', { event: '*', schema: 'public', table: 'bookings', filter: 'tenant_id=eq.' + _tid }, async () => {
+                        await BookingStorage.syncFromSupabase(); _rerender();
+                    }).subscribe();
+                supabaseClient.channel('schedule-rt')
+                    .on('postgres_changes', { event: '*', schema: 'public', table: 'schedule_overrides', filter: 'tenant_id=eq.' + _tid }, async () => {
+                        await BookingStorage.syncAppSettingsFromSupabase(); _rerender();
+                    }).subscribe();
+            }
+        })();
+
+        window.addEventListener('storage', (ev) => {
+            if (ev.key === 'app_bookings' || ev.key === 'scheduleOverrides') {
+                if (typeof renderCalendar === 'function') renderCalendar();
+                if (typeof renderMobileCalendar === 'function') renderMobileCalendar();
+            }
+        });
+        } // close else (TENANT_SLUG)
+    </script>
+    <script src="js/sw-update.js"></script>
+    <script src="js/pwa-install.js"></script>
+</body>
+</html>

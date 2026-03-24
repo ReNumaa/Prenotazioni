@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; connect-src 'self' https://*.supabase.co wss://*.supabase.co; img-src 'self' data: https: blob:; font-src 'self'; frame-src 'self' https://accounts.google.com; form-action 'self'">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <link rel="manifest" href="manifest.json?v=1">
+    <meta name="theme-color" content="#4F46E5">
+    <title>Amministrazione</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚙️</text></svg>">
+    <link rel="stylesheet" href="css/style.css?v=1">
+    <link rel="stylesheet" href="css/admin.css?v=1">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <a href="/" class="nav-brand-link">📅 <span class="brand-text">Amministrazione</span></a>
+            </div>
+            <div class="nav-right">
+                <ul class="nav-desktop-links">
+                    <li><a href="/">Calendario</a></li>
+                </ul>
+                <div id="navUserMenu" style="display:flex; align-items:center; gap:0.4rem;">
+                    <span id="navUserName" class="nav-user-name">Admin</span>
+                    <button id="navLogoutBtn" class="nav-logout-btn">Esci</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <section class="dashboard-section">
+        <div class="container">
+            <div class="admin-tabs">
+                <button class="admin-tab active" onclick="switchAdminTab('prenotazioni')">Prenotazioni</button>
+                <button class="admin-tab" onclick="switchAdminTab('clienti')">Clienti</button>
+                <button class="admin-tab" onclick="switchAdminTab('orari')">Orari</button>
+                <button class="admin-tab" onclick="switchAdminTab('servizi')">Servizi</button>
+                <button class="admin-tab" onclick="switchAdminTab('impostazioni')">Impostazioni</button>
+            </div>
+
+            <!-- TAB: Prenotazioni -->
+            <div id="tabPrenotazioni" class="admin-tab-panel">
+                <div id="adminCalendarContainer"></div>
+            </div>
+
+            <!-- TAB: Clienti -->
+            <div id="tabClienti" class="admin-tab-panel" style="display:none;">
+                <div style="display:flex;gap:0.5rem;align-items:center;margin-bottom:1rem;">
+                    <input type="text" id="clientSearch" placeholder="Cerca cliente..." oninput="renderClientList()" class="settings-input" style="flex:1;">
+                    <button onclick="openClientModal()" class="settings-btn-primary" style="white-space:nowrap;">+ Aggiungi</button>
+                </div>
+                <div id="clientList" class="admin-client-list"></div>
+            </div>
+
+            <!-- Client Modal (add/edit) -->
+            <div id="clientModal" class="modal-overlay" style="display:none;" onclick="if(event.target===this)closeClientModal()">
+                <div class="modal-box" style="max-width:480px;">
+                    <button class="modal-close" onclick="closeClientModal()">&#10005;</button>
+                    <h3 id="clientModalTitle" style="margin-bottom:1rem;">Nuovo cliente</h3>
+                    <form id="clientForm" class="auth-form" onsubmit="saveClient(event)">
+                        <input type="hidden" id="clientEditIndex" value="-1">
+                        <div class="settings-field">
+                            <label>Nome e Cognome *</label>
+                            <input type="text" id="clientName" class="settings-input" placeholder="Mario Rossi" required>
+                        </div>
+                        <div class="settings-field">
+                            <label>Email</label>
+                            <input type="email" id="clientEmail" class="settings-input" placeholder="mario@email.com">
+                        </div>
+                        <div class="settings-field">
+                            <label>Telefono</label>
+                            <input type="tel" id="clientPhone" class="settings-input" placeholder="+39 333 1234567">
+                        </div>
+                        <div class="settings-field">
+                            <label>Note (opzionale)</label>
+                            <textarea id="clientNotes" class="settings-input" rows="2" placeholder="Es. preferisce il mattino, allergie..."></textarea>
+                        </div>
+                        <div id="clientFormError" class="login-error" style="display:none;"></div>
+                        <div style="display:flex;gap:0.5rem;margin-top:0.5rem;">
+                            <button type="submit" class="settings-btn-primary" style="flex:1;">Salva</button>
+                            <button type="button" onclick="closeClientModal()" style="flex:1;padding:0.6rem;border:1px solid #ddd;border-radius:8px;background:#fff;cursor:pointer;">Annulla</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- TAB: Gestione Orari -->
+            <div id="tabOrari" class="admin-tab-panel" style="display:none;">
+                <div id="scheduleManager"></div>
+            </div>
+
+            <!-- TAB: Servizi -->
+            <div id="tabServizi" class="admin-tab-panel" style="display:none;">
+                <div id="serviziManager"></div>
+            </div>
+
+            <!-- TAB: Impostazioni -->
+            <div id="tabImpostazioni" class="admin-tab-panel" style="display:none;">
+                <div id="settingsPanel"></div>
+            </div>
+        </div>
+    </section>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.99.1/dist/umd/supabase.min.js" integrity="sha384-nBSomYN4UWX4we7Pw5GsQDkjtwLh2Wde+3szWl5Lzf0zuN9XncHIZLNoucos4C7f" crossorigin="anonymous"></script>
+    <script src="js/supabase-client.js?v=1"></script>
+    <script src="js/ui.js?v=1"></script>
+    <script src="js/data.js?v=1"></script>
+    <script src="js/tenant.js?v=1"></script>
+    <script src="js/auth.js?v=1"></script>
+    <script src="js/admin.js?v=1"></script>
+    <script src="js/admin-calendar.js?v=1"></script>
+    <script src="js/admin-clients.js?v=1"></script>
+    <script src="js/admin-schedule.js?v=1"></script>
+    <script src="js/admin-settings.js?v=1"></script>
+    <script>
+        (async () => {
+            if (!TENANT_SLUG) { window.location.href = 'index.html'; return; }
+            await resolveTenant();
+            await initAuth();
+            rewriteTenantLinks();
+            const isAdmin = sessionStorage.getItem('adminAuth') === 'true';
+            if (!isAdmin) {
+                // Check tenant role via Supabase
+                const role = await checkTenantRole(CURRENT_TENANT?.id);
+                if (!role) { window.location.href = tenantUrl('index.html'); return; }
+                sessionStorage.setItem('adminAuth', 'true');
+            }
+            await Promise.all([
+                BookingStorage.syncFromSupabase(),
+                BookingStorage.syncAppSettingsFromSupabase(),
+            ]);
+            if (typeof UserStorage !== 'undefined') UserStorage.syncUsersFromSupabase();
+            if (typeof initAdminCalendar === 'function') initAdminCalendar();
+            if (typeof renderClientList === 'function') renderClientList();
+            if (typeof initScheduleManager === 'function') initScheduleManager();
+            if (typeof renderServiziManager === 'function') renderServiziManager();
+            if (typeof renderSettingsPanel === 'function') renderSettingsPanel();
+
+            if (typeof supabaseClient !== 'undefined' && CURRENT_TENANT?.id) {
+                supabaseClient.channel('admin-rt')
+                    .on('postgres_changes', {
+                        event: '*', schema: 'public', table: 'bookings',
+                        filter: 'tenant_id=eq.' + CURRENT_TENANT.id
+                    }, async () => {
+                        await BookingStorage.syncFromSupabase();
+                        if (typeof refreshAdminCalendar === 'function') refreshAdminCalendar();
+                    }).subscribe();
+            }
+        })();
+
+        const _allTabs = ['prenotazioni','clienti','orari','servizi','impostazioni'];
+        function switchAdminTab(tab) {
+            document.querySelectorAll('.admin-tab').forEach((btn, i) => {
+                btn.classList.toggle('active', _allTabs[i] === tab);
+            });
+            _allTabs.forEach(t => {
+                const el = document.getElementById('tab' + t[0].toUpperCase() + t.slice(1));
+                if (el) el.style.display = t === tab ? '' : 'none';
+            });
+            if (tab === 'servizi' && typeof renderServiziManager === 'function') renderServiziManager();
+            if (tab === 'impostazioni' && typeof renderSettingsPanel === 'function') renderSettingsPanel();
+        }
+
+        document.getElementById('navLogoutBtn')?.addEventListener('click', async () => {
+            await logoutUser(); window.location.href = tenantUrl('index.html');
+        });
+    </script>
+</body>
+</html>

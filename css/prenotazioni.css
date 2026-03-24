@@ -1,0 +1,645 @@
+/* ===== Prenotazioni Page ===== */
+
+.preno-page {
+    min-height: calc(100vh - 70px - 60px);
+    padding: 2.5rem 0 3rem;
+    background: var(--light-gray);
+}
+
+/* ── Header utente ────────────────────────────────────────────── */
+.preno-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.preno-avatar {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: var(--primary-cyan);
+    color: white;
+    font-size: 1.4rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.preno-header-top {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+}
+
+.preno-title {
+    font-size: 1.5rem;
+    color: var(--dark-bg);
+    margin: 0 0 0.15rem;
+}
+
+.preno-subtitle {
+    font-size: 0.88rem;
+    color: #777;
+    margin: 0;
+}
+
+.preno-edit-btn {
+    background: none;
+    border: 1.5px solid #e0e0e0;
+    color: #666;
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 0.18rem 0.55rem;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.preno-edit-btn:hover {
+    background: #f0f0f0;
+    border-color: #aaa;
+}
+
+.preno-chart-btn {
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+@media (max-width: 480px) {
+    .preno-edit-label { display: none; }
+}
+
+/* ── Certificato medico warning ───────────────────────────────── */
+.preno-cert-warning {
+    border-radius: 10px;
+    padding: 0.65rem 1rem;
+    font-size: 0.88rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.preno-cert-expired {
+    background: #fef2f2;
+    color: #dc2626;
+    border-left: 4px solid #dc2626;
+}
+
+.preno-cert-expiring {
+    background: #fffbeb;
+    color: #92400e;
+    border-left: 4px solid #f59e0b;
+}
+
+.preno-cert-clickable {
+    cursor: pointer;
+}
+
+.preno-cert-clickable:hover {
+    opacity: 0.85;
+}
+
+/* ── Edit profile modal ───────────────────────────────────────── */
+.edit-profile-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--dark-bg);
+    margin: 0 0 1rem;
+}
+
+.edit-profile-label-note {
+    font-weight: 400;
+    color: #999;
+    font-size: 0.8rem;
+}
+
+.edit-profile-error {
+    background: #fef2f2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+}
+
+/* ── Saldo card ───────────────────────────────────────────────── */
+.preno-saldo-card {
+    background: white;
+    border-radius: 12px;
+    padding: 0.9rem 1.1rem;
+    margin-bottom: 1.25rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.preno-saldo-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.preno-saldo-label {
+    font-size: 0.88rem;
+    color: #555;
+}
+
+.preno-saldo-value {
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.preno-saldo-credit { color: #166534; }
+.preno-saldo-debit  { color: #92400e; }
+.preno-saldo-bonus  { color: #6b21a8; }
+.preno-saldo-bonus-available { color: #6b21a8; }
+.preno-saldo-bonus-used      { color: #9ca3af; }
+
+.preno-saldo-credit-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.preno-topup-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px solid #166534;
+    background: transparent;
+    color: #166534;
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0;
+    transition: background 0.2s, color 0.2s;
+}
+.preno-topup-btn:hover {
+    background: #166534;
+    color: #fff;
+}
+
+/* ── Top-up modal ────────────────────────────────────────────── */
+.topup-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+}
+.topup-subtitle {
+    font-size: 0.85rem;
+    color: #666;
+    margin-bottom: 1rem;
+}
+.topup-amounts {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6rem;
+    margin-bottom: 1rem;
+}
+.topup-amount-btn {
+    padding: 0.75rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    background: #fff;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #333;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+}
+.topup-amount-btn:hover {
+    border-color: #4F46E5;
+}
+.topup-amount-btn.active {
+    border-color: #4F46E5;
+    background: #e8f7fe;
+    color: #0077b6;
+}
+.topup-custom-row {
+    margin-bottom: 1rem;
+}
+.topup-custom-row label {
+    display: block;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 0.3rem;
+}
+.topup-custom-row input {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+.topup-custom-row input:focus {
+    border-color: #4F46E5;
+    outline: none;
+}
+.topup-confirm-btn {
+    width: 100%;
+    margin-top: 0.25rem;
+}
+.topup-confirm-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+.topup-note {
+    font-size: 0.75rem;
+    color: #999;
+    text-align: center;
+    margin-top: 0.6rem;
+}
+
+.preno-saldo-divider {
+    height: 1px;
+    background: #f0f0f0;
+    margin: 0.65rem 0;
+}
+
+/* ── Tabs ────────────────────────────────────────────────────── */
+.preno-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+    border-bottom: 2px solid #e0e0e0;
+    padding-bottom: 0;
+}
+
+.preno-tab {
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+    padding: 0.5rem 1.25rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #888;
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s;
+}
+
+.preno-tab:hover {
+    color: var(--dark-bg);
+}
+
+.preno-tab.active {
+    color: var(--dark-bg);
+    border-bottom-color: var(--primary-cyan);
+}
+
+/* ── Booking list ─────────────────────────────────────────────── */
+.preno-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+/* ── Booking card ─────────────────────────────────────────────── */
+.preno-card {
+    background: white;
+    border-radius: 12px;
+    border-left: 5px solid #ddd;
+    padding: 1rem 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.preno-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+}
+
+.preno-card.personal-training { border-left-color: var(--personal-training); }
+.preno-card.small-group        { border-left-color: var(--small-group); }
+.preno-card.group-class        { border-left-color: var(--group-class); }
+.preno-card.cleaning           { border-left-color: var(--cleaning); }
+.preno-card.servizio-1         { border-left-color: #2ecc71; }
+.preno-card.servizio-2         { border-left-color: #3498db; }
+.preno-card.servizio-3         { border-left-color: #9b59b6; }
+
+.preno-card-info { flex: 1; min-width: 0; }
+.preno-card-date { font-weight: 600; font-size: 0.95rem; }
+.preno-card-time { font-size: 0.85rem; color: #666; }
+.preno-card-type { font-size: 0.8rem; color: #888; margin-top: 0.15rem; }
+.preno-card-cancelled {
+    display: inline-block; font-size: 0.7rem; background: #fee;
+    color: #c0392b; padding: 0.15rem 0.5rem; border-radius: 6px;
+    font-weight: 600; margin-top: 0.25rem;
+}
+
+.preno-card-left {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.preno-card-date {
+    font-weight: 700;
+    color: var(--dark-bg);
+    font-size: 0.95rem;
+}
+
+.preno-card-time {
+    font-size: 0.88rem;
+    color: #555;
+}
+
+.preno-card-type {
+    font-size: 0.8rem;
+    color: #888;
+    margin-top: 0.1rem;
+}
+
+.preno-card-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+
+/* ── Badges ───────────────────────────────────────────────────── */
+.preno-badge {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+    white-space: nowrap;
+}
+
+.preno-badge-paid {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.preno-badge-unpaid {
+    background: #fef9c3;
+    color: #854d0e;
+}
+
+.preno-badge-partial {
+    background: #ede9fe;
+    color: #5b21b6;
+    white-space: normal;
+    text-align: center;
+}
+
+.preno-badge-cancelled {
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
+/* ── Cancel button ────────────────────────────────────────────── */
+.preno-cancel-btn {
+    background: none;
+    border: 1.5px solid #e0e0e0;
+    color: #dc2626;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 0.25rem 0.7rem;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+    white-space: nowrap;
+}
+
+.preno-cancel-btn:hover {
+    background: #fee2e2;
+    border-color: #dc2626;
+}
+
+/* ── Bonus cancel button ──────────────────────────────────────── */
+.preno-cancel-bonus {
+    color: #6b21a8;
+    border-color: #d8b4fe;
+}
+.preno-cancel-bonus:hover {
+    background: #f3e8ff;
+    border-color: #6b21a8;
+}
+.preno-cancel-penalty {
+    color: #b45309;
+    border-color: #fcd34d;
+}
+.preno-cancel-penalty:hover {
+    background: #fffbeb;
+    border-color: #b45309;
+}
+
+/* ── Cancellation pending badge ───────────────────────────────── */
+.preno-cancel-pending {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+    background: #fef3c7;
+    color: #92400e;
+    white-space: nowrap;
+}
+
+/* ── Cancellation locked badge (group-class < 3 days) ─────────── */
+.preno-cancel-locked {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+    background: #f3f4f6;
+    color: #6b7280;
+    white-space: normal;
+    text-align: center;
+}
+
+/* ── Empty state ──────────────────────────────────────────────── */
+.preno-empty {
+    text-align: center;
+    color: #aaa;
+    font-size: 0.95rem;
+    padding: 3rem 1rem;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.preno-empty-link {
+    display: inline-block;
+    margin-top: 0.75rem;
+    color: var(--primary-cyan);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.preno-empty-link:hover {
+    text-decoration: underline;
+}
+
+/* ── Show more button ─────────────────────────────────────────── */
+.preno-show-more {
+    display: block;
+    width: 100%;
+    padding: 0.75rem;
+    margin-top: 0.75rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    background: #fff;
+    color: #2563eb;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+.preno-show-more:hover {
+    background: #f0f4ff;
+    border-color: #2563eb;
+}
+.preno-show-more:active {
+    transform: scale(0.98);
+}
+
+/* ── Bottom CTA ───────────────────────────────────────────────── */
+.preno-cta {
+    margin-top: 2rem;
+    text-align: center;
+}
+
+.preno-cta-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--primary-cyan);
+    color: white;
+    font-weight: 700;
+    font-size: 0.95rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 10px;
+    text-decoration: none;
+    transition: opacity 0.2s, transform 0.15s;
+}
+
+.preno-cta-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+/* ── Transazioni ──────────────────────────────────────────────── */
+.preno-tx-row {
+    background: white;
+    border-radius: 12px;
+    padding: 0.85rem 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.preno-tx-icon {
+    font-size: 1.15rem;
+    width: 1.8rem;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.preno-tx-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.preno-tx-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--dark-bg);
+}
+
+.preno-tx-sub {
+    font-size: 0.78rem;
+    color: #888;
+    margin-top: 0.1rem;
+}
+
+.preno-tx-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    flex-shrink: 0;
+    gap: 0.1rem;
+}
+
+.preno-tx-amount {
+    font-size: 0.95rem;
+    font-weight: 700;
+}
+
+.preno-tx-date {
+    font-size: 0.72rem;
+    color: #bbb;
+}
+
+.tx-pos     { color: #166534; }
+.tx-neg     { color: #dc2626; }
+.tx-neutral { color: #555; }
+.tx-credit  { color: #5b21b6; }
+
+/* ── Responsive ───────────────────────────────────────────────── */
+@media (max-width: 480px) {
+    .preno-page {
+        padding: 1.5rem 0 2rem;
+    }
+
+    .preno-header {
+        gap: 0.75rem;
+    }
+
+    .preno-title {
+        font-size: 1.2rem;
+    }
+
+    .preno-card {
+        flex-wrap: wrap;
+        align-items: flex-start;
+    }
+
+    .preno-card-left {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .preno-card-date {
+        font-size: 0.82rem;
+    }
+
+    .preno-card-right {
+        flex-direction: column;
+        align-items: flex-end;
+        width: auto;
+        max-width: 130px;
+    }
+
+    .preno-badge {
+        white-space: normal;
+        text-align: center;
+        padding-left: 0.3rem;
+        padding-right: 0.3rem;
+    }
+
+    .preno-cancel-btn {
+        white-space: normal;
+        text-align: center;
+        padding-left: 0.3rem;
+        padding-right: 0.3rem;
+    }
+
+}

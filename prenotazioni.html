@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; connect-src 'self' https://*.supabase.co wss://*.supabase.co; img-src 'self' data: https:; font-src 'self'; frame-src 'self' https://accounts.google.com; form-action 'self'">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <link rel="manifest" href="manifest.json?v=1">
+    <meta name="theme-color" content="#4F46E5">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Prenotazioni">
+    <title>I miei appuntamenti</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📅</text></svg>">
+    <link rel="stylesheet" href="css/style.css?v=1">
+    <link rel="stylesheet" href="css/login.css?v=1">
+    <link rel="stylesheet" href="css/prenotazioni.css?v=1">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <a href="/" class="nav-brand-link">📅 <span class="brand-text">Prenotazioni</span></a>
+            </div>
+            <div class="nav-right">
+                <ul class="nav-desktop-links">
+                    <li><a href="/">Calendario</a></li>
+                </ul>
+                <div id="navLoginLink" style="display:flex; align-items:center;">
+                    <a href="login.html" class="nav-login-btn">Accedi</a>
+                </div>
+                <div id="navUserMenu" style="display:none; align-items:center; gap:0.4rem;">
+                    <span id="navUserName" class="nav-user-name"></span>
+                    <button id="navLogoutBtn" class="nav-logout-btn">Esci</button>
+                </div>
+                <button class="nav-hamburger" id="navHamburger" aria-label="Menu">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="preno-page">
+        <div class="container">
+            <div class="preno-header">
+                <div class="preno-avatar" id="prenoAvatar"></div>
+                <div class="preno-header-info">
+                    <div class="preno-header-top">
+                        <h1 class="preno-title" id="prenoUserName">I miei appuntamenti</h1>
+                        <button class="preno-edit-btn" onclick="openEditProfileModal()">&#9998;<span class="preno-edit-label"> Modifica profilo</span></button>
+                    </div>
+                    <p class="preno-subtitle" id="prenoUserEmail"></p>
+                </div>
+            </div>
+
+            <div class="preno-tabs">
+                <button class="preno-tab active" id="tabProssime" onclick="switchPrenoTab('upcoming')">Prossimi</button>
+                <button class="preno-tab" id="tabPassate" onclick="switchPrenoTab('past')">Passati</button>
+            </div>
+
+            <div id="prenoList" class="preno-list"></div>
+
+            <div class="preno-cta">
+                <a href="/" class="preno-cta-btn">Prenota un appuntamento</a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Edit Profile Modal -->
+    <div id="editProfileModal" class="modal-overlay" style="display:none;" onclick="if(event.target===this)closeEditProfileModal()">
+        <div class="modal-box" style="max-width:480px;">
+            <button class="modal-close" onclick="closeEditProfileModal()">&#10005;</button>
+            <h3 style="margin-bottom:1rem;">Modifica profilo</h3>
+            <form id="editProfileForm" class="auth-form">
+                <div class="form-group">
+                    <label for="editName">Nome e Cognome</label>
+                    <input type="text" id="editName" autocomplete="name">
+                </div>
+                <div class="form-group">
+                    <label for="editEmail">Email</label>
+                    <input type="email" id="editEmail" autocomplete="email">
+                </div>
+                <div class="form-group">
+                    <label for="editWhatsapp">Telefono</label>
+                    <input type="tel" id="editWhatsapp" autocomplete="tel">
+                </div>
+                <div class="form-group">
+                    <label for="editPassword">Nuova Password (opzionale)</label>
+                    <input type="password" id="editPassword" placeholder="Lascia vuoto per non cambiare" autocomplete="new-password">
+                </div>
+                <div id="editProfileError" class="login-error" style="display:none;"></div>
+                <button type="submit" class="btn-primary" style="width:100%;">Salva</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="nav-sidebar-overlay" id="navSidebarOverlay" onclick="toggleNavMenu()"></div>
+    <nav class="nav-sidebar" id="navSidebar">
+        <div class="nav-sidebar-header">
+            <span class="nav-sidebar-title">Menu</span>
+            <button class="nav-sidebar-close" onclick="toggleNavMenu()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+        <ul class="nav-sidebar-links">
+            <li><a href="/">Calendario</a></li>
+        </ul>
+    </nav>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.99.1/dist/umd/supabase.min.js" integrity="sha384-nBSomYN4UWX4we7Pw5GsQDkjtwLh2Wde+3szWl5Lzf0zuN9XncHIZLNoucos4C7f" crossorigin="anonymous"></script>
+    <script src="js/supabase-client.js?v=1"></script>
+    <script src="js/ui.js?v=1"></script>
+    <script src="js/data.js?v=1"></script>
+    <script src="js/tenant.js?v=1"></script>
+    <script src="js/auth.js?v=1"></script>
+    <script src="js/admin-settings.js?v=1"></script>
+    <script>
+        let _currentPrenoTab = 'upcoming';
+
+        function switchPrenoTab(tab) {
+            _currentPrenoTab = tab;
+            document.getElementById('tabProssime').classList.toggle('active', tab === 'upcoming');
+            document.getElementById('tabPassate').classList.toggle('active', tab === 'past');
+            renderPrenoList();
+        }
+
+        function renderPrenoList() {
+            const user = getCurrentUser();
+            const container = document.getElementById('prenoList');
+            if (!user) { container.innerHTML = '<p style="text-align:center;color:#999;padding:2rem;">Accedi per vedere i tuoi appuntamenti.</p>'; return; }
+
+            const { upcoming, past } = getUserBookings();
+            const list = _currentPrenoTab === 'upcoming' ? upcoming : past;
+
+            if (!list.length) {
+                container.innerHTML = `<p style="text-align:center;color:#999;padding:2rem;">${_currentPrenoTab === 'upcoming' ? 'Nessun appuntamento in programma.' : 'Nessun appuntamento passato.'}</p>`;
+                return;
+            }
+
+            container.innerHTML = list.map(b => {
+                const canCancel = _currentPrenoTab === 'upcoming' && b.status === 'confirmed';
+                let cancelBtn = '';
+                if (canCancel) {
+                    const cancHours = typeof CURRENT_TENANT !== 'undefined' && CURRENT_TENANT?.cancellation_hours != null
+                        ? CURRENT_TENANT.cancellation_hours : 24;
+                    const tp = _parseSlotTime(b.time);
+                    let hoursLeft = 999;
+                    if (tp) {
+                        const start = new Date(b.date + 'T' + String(tp.startH).padStart(2,'0') + ':' + String(tp.startM).padStart(2,'0') + ':00');
+                        hoursLeft = (start - new Date()) / (1000 * 60 * 60);
+                    }
+                    if (cancHours === 0 || hoursLeft > cancHours) {
+                        cancelBtn = `<button class="preno-cancel-btn" onclick="cancelBooking('${b.id}')">Annulla</button>`;
+                    } else if (hoursLeft > 0) {
+                        cancelBtn = `<span style="font-size:0.75rem;color:#e67e22;text-align:right;">Non annullabile<br>(meno di ${cancHours}h)</span>`;
+                    }
+                }
+                return `
+                <div class="preno-card ${b.slotType}">
+                    <div class="preno-card-info">
+                        <div class="preno-card-date">${b.dateDisplay || b.date}</div>
+                        <div class="preno-card-time">${b.time}</div>
+                        <div class="preno-card-type">${SLOT_NAMES[b.slotType] || b.slotType}</div>
+                        ${b.status === 'cancelled' ? '<span class="preno-card-cancelled">Annullato</span>' : ''}
+                    </div>
+                    ${cancelBtn}
+                </div>`;
+            }).join('');
+        }
+
+        async function cancelBooking(id) {
+            const cancPolicy = typeof CURRENT_TENANT !== 'undefined' && CURRENT_TENANT?.cancellation_policy
+                ? CURRENT_TENANT.cancellation_policy : '';
+            if (!confirm('Vuoi annullare questo appuntamento?' + (cancPolicy ? '\n\n' + cancPolicy : ''))) return;
+            // Get booking info before cancelling (for admin notification)
+            const booking = BookingStorage.getAllBookings().find(b => b.id === id);
+            BookingStorage.cancelDirectly(id);
+            showToast('Appuntamento annullato.', 'success');
+            renderPrenoList();
+            // Notify admin (fire-and-forget)
+            if (booking && typeof SUPABASE_URL !== 'undefined' && !SUPABASE_URL.includes('YOUR_PROJECT') && CURRENT_TENANT?.id) {
+                fetch(`${SUPABASE_URL}/functions/v1/notify-booking`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY },
+                    body: JSON.stringify({
+                        tenant_id: CURRENT_TENANT.id, type: 'cancellation',
+                        client_name: booking.name || '', date_display: booking.dateDisplay || booking.date || '',
+                        time: booking.time || '', service_name: SLOT_NAMES[booking.slotType] || '',
+                    }),
+                }).catch(() => {});
+            }
+        }
+
+        function openEditProfileModal() {
+            const user = getCurrentUser();
+            if (!user) return;
+            document.getElementById('editName').value = user.name || '';
+            document.getElementById('editEmail').value = user.email || '';
+            document.getElementById('editWhatsapp').value = user.whatsapp || '';
+            document.getElementById('editPassword').value = '';
+            document.getElementById('editProfileError').style.display = 'none';
+            document.getElementById('editProfileModal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeEditProfileModal() {
+            document.getElementById('editProfileModal').style.display = 'none';
+            document.body.style.overflow = '';
+        }
+
+        document.getElementById('editProfileForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const user = getCurrentUser();
+            const errEl = document.getElementById('editProfileError');
+            errEl.style.display = 'none';
+            const btn = e.target.querySelector('button[type="submit"]');
+            setLoading(btn, true, 'Salvataggio...');
+            const result = await updateUserProfile(user.email, {
+                name: document.getElementById('editName').value.trim(),
+                email: document.getElementById('editEmail').value.trim(),
+                whatsapp: normalizePhone(document.getElementById('editWhatsapp').value.trim()),
+            }, document.getElementById('editPassword').value || null);
+            setLoading(btn, false);
+            if (!result.ok) { errEl.textContent = result.error; errEl.style.display = 'block'; return; }
+            showToast('Profilo aggiornato!', 'success');
+            closeEditProfileModal();
+            renderPageHeader();
+        });
+
+        function renderPageHeader() {
+            const user = getCurrentUser();
+            if (!user) return;
+            document.getElementById('prenoUserName').textContent = user.name || 'I miei appuntamenti';
+            document.getElementById('prenoUserEmail').textContent = user.email || '';
+            const avatar = document.getElementById('prenoAvatar');
+            if (avatar) avatar.textContent = (user.name || 'U')[0].toUpperCase();
+        }
+
+        (async () => {
+            if (!TENANT_SLUG) { window.location.href = 'index.html'; return; }
+            await resolveTenant();
+            await initAuth();
+            rewriteTenantLinks();
+            const user = getCurrentUser();
+            if (!user) { window.location.href = tenantUrl('login.html'); return; }
+            renderPageHeader();
+            await BookingStorage.syncFromSupabase({ ownOnly: true });
+            renderPrenoList();
+
+            // Realtime
+            if (typeof supabaseClient !== 'undefined') {
+                supabaseClient.channel('bookings-rt-preno')
+                    .on('postgres_changes', { event: '*', schema: 'public', table: 'bookings' }, async () => {
+                        await BookingStorage.syncFromSupabase({ ownOnly: true });
+                        renderPrenoList();
+                    }).subscribe();
+            }
+        })();
+    </script>
+    <script src="js/sw-update.js"></script>
+</body>
+</html>
