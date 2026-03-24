@@ -5151,6 +5151,43 @@ textarea.settings-input {
     background: #fef2f2;
 }
 
+/* Logo upload area */
+.logo-upload-area {
+    border: 2px dashed #ddd;
+    border-radius: 12px;
+    padding: 1rem;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    text-align: center;
+    min-height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.logo-upload-area:hover {
+    border-color: var(--primary-cyan);
+    background: rgba(79, 70, 229, 0.03);
+}
+.logo-upload-area.drag-over {
+    border-color: var(--primary-cyan);
+    background: rgba(79, 70, 229, 0.08);
+    border-style: solid;
+}
+.logo-upload-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    color: #999;
+    font-size: 0.85rem;
+}
+.logo-upload-preview {
+    max-height: 100px;
+    max-width: 200px;
+    border-radius: 8px;
+    object-fit: contain;
+}
+
 /* Settings toggle rows (notifications etc.) */
 .settings-toggle-row {
     padding: 0.6rem 0;

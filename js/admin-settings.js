@@ -266,8 +266,19 @@ function renderSettingsPanel() {
         <div class="settings-card">
             <h4 class="settings-card-title">Aspetto</h4>
             <div class="settings-field">
-                <label>Logo (URL immagine)</label>
-                <input type="url" id="bizLogoUrl" value="${_escHtml(biz.logoUrl)}" class="settings-input" placeholder="https://...logo.png">
+                <label>Logo</label>
+                <div class="logo-upload-area" id="logoUploadArea">
+                    ${biz.logoUrl
+                        ? `<img src="${_escHtml(biz.logoUrl)}" alt="Logo" class="logo-upload-preview" id="logoPreviewImg">`
+                        : `<div class="logo-upload-placeholder" id="logoPlaceholder">
+                            <span style="font-size:2rem;">📷</span>
+                            <span>Clicca o trascina per caricare il logo</span>
+                           </div>`
+                    }
+                    <input type="file" id="bizLogoFile" accept="image/*" style="display:none;" onchange="_handleLogoUpload(event)">
+                    <input type="hidden" id="bizLogoUrl" value="${_escHtml(biz.logoUrl)}">
+                </div>
+                ${biz.logoUrl ? `<button onclick="_removeLogo()" style="margin-top:0.4rem;font-size:0.8rem;color:#e74c3c;background:none;border:none;cursor:pointer;">Rimuovi logo</button>` : ''}
             </div>
             <div class="settings-row" style="margin-top:0.5rem;">
                 <div class="settings-field" style="flex:1;">
@@ -434,6 +445,8 @@ function renderSettingsPanel() {
         </button>
     `;
 
+    // Init logo upload drag & drop
+    _initLogoUpload();
     // Color preview live
     _updateColorPreview();
     document.getElementById('bizPrimaryColor')?.addEventListener('input', _updateColorPreview);
@@ -555,6 +568,98 @@ async function openBillingPortal() {
         if (data.url) window.location.href = data.url;
         else showToast('Errore apertura portale billing.', 'error');
     } catch { showToast('Errore di connessione.', 'error'); }
+}
+
+// ── Logo upload ──────────────────────────────────────────────────────────────
+
+function _initLogoUpload() {
+    const area = document.getElementById('logoUploadArea');
+    if (!area) return;
+
+    // Click to upload
+    area.addEventListener('click', (e) => {
+        if (e.target.tagName === 'BUTTON') return;
+        document.getElementById('bizLogoFile').click();
+    });
+
+    // Drag and drop
+    area.addEventListener('dragover', (e) => { e.preventDefault(); area.classList.add('drag-over'); });
+    area.addEventListener('dragleave', () => area.classList.remove('drag-over'));
+    area.addEventListener('drop', (e) => {
+        e.preventDefault();
+        area.classList.remove('drag-over');
+        const file = e.dataTransfer?.files?.[0];
+        if (file && file.type.startsWith('image/')) _processLogoFile(file);
+    });
+}
+
+function _handleLogoUpload(event) {
+    const file = event.target.files?.[0];
+    if (file) _processLogoFile(file);
+}
+
+function _processLogoFile(file) {
+    if (file.size > 500 * 1024) {
+        showToast('Immagine troppo grande (max 500 KB). Riduci le dimensioni.', 'error');
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const base64 = e.target.result;
+
+        // Resize to max 200x200 for performance
+        const img = new Image();
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const maxSize = 200;
+            let w = img.width, h = img.height;
+            if (w > maxSize || h > maxSize) {
+                if (w > h) { h = Math.round(h * maxSize / w); w = maxSize; }
+                else { w = Math.round(w * maxSize / h); h = maxSize; }
+            }
+            canvas.width = w;
+            canvas.height = h;
+            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+            const resized = canvas.toDataURL('image/png', 0.9);
+
+            // Update UI
+            document.getElementById('bizLogoUrl').value = resized;
+            const area = document.getElementById('logoUploadArea');
+            const placeholder = document.getElementById('logoPlaceholder');
+            if (placeholder) placeholder.remove();
+            let preview = document.getElementById('logoPreviewImg');
+            if (!preview) {
+                preview = document.createElement('img');
+                preview.id = 'logoPreviewImg';
+                preview.className = 'logo-upload-preview';
+                area.insertBefore(preview, area.firstChild);
+            }
+            preview.src = resized;
+            showToast('Logo caricato!', 'success');
+        };
+        img.src = base64;
+    };
+    reader.readAsDataURL(file);
+}
+
+function _removeLogo() {
+    document.getElementById('bizLogoUrl').value = '';
+    const area = document.getElementById('logoUploadArea');
+    const preview = document.getElementById('logoPreviewImg');
+    if (preview) preview.remove();
+    let placeholder = document.getElementById('logoPlaceholder');
+    if (!placeholder) {
+        placeholder = document.createElement('div');
+        placeholder.id = 'logoPlaceholder';
+        placeholder.className = 'logo-upload-placeholder';
+        placeholder.innerHTML = '<span style="font-size:2rem;">📷</span><span>Clicca o trascina per caricare il logo</span>';
+        area.insertBefore(placeholder, area.firstChild);
+    }
+    // Remove the "Rimuovi logo" button
+    const removeBtn = area.parentNode.querySelector('button[onclick="_removeLogo()"]');
+    if (removeBtn) removeBtn.remove();
+    showToast('Logo rimosso', 'success');
 }
 
 // ── Payments toggle helper ────────────────────────────────────────────────────
