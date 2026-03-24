@@ -45,6 +45,8 @@ CREATE TABLE tenants (
     notify_admin_cancellation BOOLEAN DEFAULT TRUE,   -- notifica admin annullamento
     notify_client_reminder BOOLEAN DEFAULT TRUE,      -- promemoria al cliente
     reminder_times JSONB DEFAULT '[24, 1]',           -- array ore prima dell'appuntamento (es. [24, 1] = 24h e 1h prima)
+    -- Clienti manuali: [{name, email, whatsapp, notes}]
+    manual_clients JSONB DEFAULT '[]',
     -- Servizi: [{id, name, price, capacity, color, active}]
     services JSONB DEFAULT '[
         {"id":"servizio-1","name":"Appuntamento Base","price":25,"capacity":1,"color":"#2ecc71","active":true},

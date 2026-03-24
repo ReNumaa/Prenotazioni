@@ -647,6 +647,10 @@ class WeekTemplateStorage {
     }
 
     static getAll() {
+        // Priorità: tenant config → localStorage → default
+        if (typeof CURRENT_TENANT !== 'undefined' && CURRENT_TENANT?.week_templates?.length) {
+            return CURRENT_TENANT.week_templates;
+        }
         const raw = localStorage.getItem(this.KEY);
         if (raw) { try { return JSON.parse(raw); } catch {} }
         const defaults = this._defaultTemplates();
@@ -656,14 +660,24 @@ class WeekTemplateStorage {
 
     static save(templates) {
         _lsSet(this.KEY, JSON.stringify(templates));
-        _upsertSetting(this.KEY, JSON.stringify(templates));
+        // Salva nel tenant (Supabase)
+        if (typeof saveTenantConfig === 'function') {
+            saveTenantConfig({ week_templates: templates });
+        }
     }
 
-    static getActiveId() { return parseInt(localStorage.getItem(this.ACTIVE_KEY) || '1', 10); }
+    static getActiveId() {
+        if (typeof CURRENT_TENANT !== 'undefined' && CURRENT_TENANT?.active_week_template) {
+            return CURRENT_TENANT.active_week_template;
+        }
+        return parseInt(localStorage.getItem(this.ACTIVE_KEY) || '1', 10);
+    }
 
     static setActiveId(id) {
         _lsSet(this.ACTIVE_KEY, String(id));
-        _upsertSetting(this.ACTIVE_KEY, String(id));
+        if (typeof saveTenantConfig === 'function') {
+            saveTenantConfig({ active_week_template: id });
+        }
         const templates = this.getAll();
         const active = templates.find(t => t.id === id);
         if (active) {

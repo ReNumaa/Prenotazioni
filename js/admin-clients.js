@@ -6,11 +6,21 @@
 // ── Manual clients storage ───────────────────────────────────────────────────
 
 function _getManualClients() {
+    // Leggi dal tenant (Supabase) se disponibile
+    if (typeof CURRENT_TENANT !== 'undefined' && CURRENT_TENANT?.manual_clients) {
+        return CURRENT_TENANT.manual_clients;
+    }
+    // Fallback localStorage demo
     const slug = typeof TENANT_SLUG !== 'undefined' ? TENANT_SLUG : '';
     return _lsGetJSON('manual_clients_' + slug, []);
 }
 
 function _saveManualClients(clients) {
+    // Salva nel tenant (Supabase)
+    if (typeof saveTenantConfig === 'function') {
+        saveTenantConfig({ manual_clients: clients });
+    }
+    // Fallback localStorage demo
     const slug = typeof TENANT_SLUG !== 'undefined' ? TENANT_SLUG : '';
     _lsSet('manual_clients_' + slug, JSON.stringify(clients));
 }

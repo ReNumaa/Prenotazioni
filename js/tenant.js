@@ -64,6 +64,8 @@ async function resolveTenant() {
         notify_admin_cancellation: true,
         notify_client_reminder: true,
         reminder_times: [24, 1],
+        // Clienti manuali
+        manual_clients: [],
         // Servizi
         services: [
             { id: 'servizio-1', name: 'Appuntamento Base', price: 25, capacity: 1, color: '#2ecc71', active: true },
