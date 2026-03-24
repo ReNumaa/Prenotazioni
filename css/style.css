@@ -99,7 +99,7 @@ body:not(.auth-loaded) #navUserMenu { visibility: hidden; }
 .nav-menu a:hover,
 .nav-menu a.active {
     color: var(--primary-cyan);
-    background-color: rgba(0, 174, 239, 0.1);
+    background-color: rgba(79, 70, 229, 0.1);
 }
 
 .admin-link {
@@ -239,7 +239,7 @@ body:not(.auth-loaded) #navUserMenu { visibility: hidden; }
 
 .nav-sidebar-links li a:hover {
     color: var(--primary-cyan);
-    background: rgba(0,174,239,0.1);
+    background: rgba(79,70,229,0.1);
     border-left-color: var(--primary-cyan);
 }
 
@@ -273,7 +273,56 @@ body.nav-open {
 .nav-desktop-links li a:hover,
 .nav-desktop-links li a.active {
     color: var(--primary-cyan);
-    background: rgba(0,174,239,0.1);
+    background: rgba(79,70,229,0.1);
+}
+
+/* ===== Nav auth buttons ===== */
+.nav-login-btn {
+    color: #fff;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 0.45rem 1rem;
+    border-radius: 8px;
+    background: var(--primary-cyan);
+    transition: background 0.2s, transform 0.1s;
+    white-space: nowrap;
+}
+.nav-login-btn:hover {
+    background: var(--primary-cyan-dark);
+    transform: scale(1.03);
+}
+
+.nav-user-name {
+    color: #fff;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0.35rem 0.6rem;
+    border-radius: 6px;
+    transition: background 0.2s;
+    white-space: nowrap;
+}
+.nav-user-name:hover {
+    background: rgba(255,255,255,0.12);
+}
+
+.nav-logout-btn {
+    color: rgba(255,255,255,0.6);
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    font-size: 0.8rem;
+    font-weight: 500;
+    padding: 0.35rem 0.7rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+.nav-logout-btn:hover {
+    color: #fff;
+    background: rgba(255,255,255,0.15);
+    border-color: rgba(255,255,255,0.3);
 }
 
 /* Su desktop: nascondi hamburger e sidebar */
@@ -305,7 +354,7 @@ body.nav-open {
     right: -60px;
     width: 300px;
     height: 300px;
-    background: radial-gradient(circle, rgba(0,174,239,0.12) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(79,70,229,0.12) 0%, transparent 70%);
     pointer-events: none;
 }
 
@@ -495,7 +544,7 @@ body.nav-open {
 .btn-control:hover {
     background-color: var(--primary-cyan-dark);
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 174, 239, 0.3);
+    box-shadow: 0 4px 8px rgba(79, 70, 229, 0.3);
 }
 
 /* Calendar Grid */
@@ -570,7 +619,7 @@ body.nav-open {
 
 .calendar-slot.selected {
     border: 3px solid var(--primary-cyan);
-    box-shadow: 0 0 20px rgba(0, 174, 239, 0.4);
+    box-shadow: 0 0 20px rgba(79, 70, 229, 0.4);
 }
 
 .slot-type {
@@ -714,7 +763,7 @@ body.nav-open {
 .btn-primary:hover {
     background-color: var(--primary-cyan-dark);
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 174, 239, 0.3);
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
 }
 
 .btn-primary:disabled {
@@ -907,7 +956,7 @@ body.nav-open {
 
 .mobile-slot-card.selected {
     border: 2px solid var(--primary-cyan);
-    box-shadow: 0 4px 16px rgba(0, 174, 239, 0.3);
+    box-shadow: 0 4px 16px rgba(79, 70, 229, 0.3);
     transform: scale(1.02);
 }
 
@@ -1685,10 +1734,20 @@ body.nav-open {
     color: rgba(255, 255, 255, 0.75);
 }
 
-/* On mobile: hide navbar Esci (it lives in the sidebar instead) */
+/* On mobile: compact auth buttons */
 @media (max-width: 768px) {
     .nav-logout-btn {
-        display: none;
+        display: none; /* Esci vive nella sidebar su mobile */
+    }
+    .nav-user-name {
+        font-size: 0.8rem;
+        max-width: 100px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .nav-login-btn {
+        font-size: 0.8rem;
+        padding: 0.4rem 0.75rem;
     }
 }
 

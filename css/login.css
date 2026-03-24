@@ -340,7 +340,7 @@
 .login-card .form-group input:focus {
     outline: none;
     border-color: var(--primary-cyan);
-    box-shadow: 0 0 0 3px rgba(0,174,239,0.12);
+    box-shadow: 0 0 0 3px rgba(79,70,229,0.12);
 }
 
 /* Password show/hide toggle */

@@ -27,7 +27,7 @@
 .login-section::before {
     width: 500px;
     height: 500px;
-    background: rgba(0, 174, 239, 0.07);
+    background: rgba(79, 70, 229, 0.07);
     top: -150px;
     right: -150px;
 }
@@ -35,17 +35,17 @@
 .login-section::after {
     width: 350px;
     height: 350px;
-    background: rgba(0, 174, 239, 0.05);
+    background: rgba(79, 70, 229, 0.05);
     bottom: -100px;
     left: -100px;
 }
 
 .login-box {
     background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(0, 174, 239, 0.18);
+    border: 1px solid rgba(79, 70, 229, 0.18);
     padding: 2.75rem 2.5rem 2.25rem;
     border-radius: 18px;
-    box-shadow: 0 28px 80px rgba(0, 0, 0, 0.65), 0 0 60px rgba(0, 174, 239, 0.06);
+    box-shadow: 0 28px 80px rgba(0, 0, 0, 0.65), 0 0 60px rgba(79, 70, 229, 0.06);
     max-width: 420px;
     width: 100%;
     position: relative;
@@ -67,8 +67,8 @@
     justify-content: center;
     width: 54px;
     height: 54px;
-    background: rgba(0, 174, 239, 0.1);
-    border: 1px solid rgba(0, 174, 239, 0.28);
+    background: rgba(79, 70, 229, 0.1);
+    border: 1px solid rgba(79, 70, 229, 0.28);
     border-radius: 14px;
     margin: 0 auto 1.25rem;
 }
@@ -122,8 +122,8 @@
 
 .login-box .form-group input:focus {
     border-color: var(--primary-cyan);
-    background: rgba(0, 174, 239, 0.07);
-    box-shadow: 0 0 0 3px rgba(0, 174, 239, 0.12);
+    background: rgba(79, 70, 229, 0.07);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
     outline: none;
 }
 
@@ -134,13 +134,13 @@
     font-weight: 600;
     letter-spacing: 0.4px;
     padding: 0.9rem;
-    box-shadow: 0 4px 20px rgba(0, 174, 239, 0.28);
+    box-shadow: 0 4px 20px rgba(79, 70, 229, 0.28);
     transition: all 0.2s;
 }
 
 .login-box .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 30px rgba(0, 174, 239, 0.42);
+    box-shadow: 0 8px 30px rgba(79, 70, 229, 0.42);
 }
 
 .hint {
@@ -198,7 +198,7 @@
 
 .admin-tab:hover {
     color: var(--primary-cyan);
-    background-color: rgba(0, 174, 239, 0.05);
+    background-color: rgba(79, 70, 229, 0.05);
 }
 
 .admin-tab.active {
@@ -376,7 +376,7 @@
 
 .stat-change.negative {
     color: var(--primary-cyan);
-    background-color: rgba(0, 174, 239, 0.1);
+    background-color: rgba(79, 70, 229, 0.1);
 }
 
 /* Dashboard Grid */
@@ -807,7 +807,7 @@ canvas {
 
 .admin-participant-card:hover {
     border-color: var(--primary-cyan);
-    box-shadow: 0 4px 12px rgba(0, 174, 239, 0.15);
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.15);
     transform: translateY(-3px);
 }
 
@@ -1054,7 +1054,7 @@ canvas {
 .cstat.paid   { background: rgba(34,197,94,0.1);   color: #166534; }
 .cstat.free   { background: rgba(22,163,74,0.08);  color: #15803d; }
 .cstat.unpaid { background: rgba(239,68,68,0.1);   color: #991b1b; }
-.cstat.credit { background: rgba(0,174,239,0.12);  color: #0369a1; }
+.cstat.credit { background: rgba(79,70,229,0.12);  color: #0369a1; }
 
 .client-chevron {
     font-size: 0.8rem;
@@ -1678,7 +1678,7 @@ canvas {
 
 .schedule-slot-item-selector:hover {
     border-color: var(--primary-cyan);
-    box-shadow: 0 2px 8px rgba(0, 174, 239, 0.15);
+    box-shadow: 0 2px 8px rgba(79, 70, 229, 0.15);
 }
 
 .schedule-slot-dropdown {
@@ -1700,13 +1700,13 @@ canvas {
 
 .slot-type-select:hover {
     border-color: var(--primary-cyan);
-    background-color: rgba(0, 174, 239, 0.05);
+    background-color: rgba(79, 70, 229, 0.05);
 }
 
 .slot-type-select:focus {
     outline: none;
     border-color: var(--primary-cyan);
-    box-shadow: 0 0 0 3px rgba(0, 174, 239, 0.1);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
 }
 
 .current-type-badge {
@@ -1835,7 +1835,7 @@ canvas {
 .slot-client-input:focus {
     outline: none;
     border-color: var(--primary-cyan);
-    box-shadow: 0 0 0 2px rgba(0, 174, 239, 0.15);
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.15);
 }
 
 .slot-client-results {
@@ -1867,7 +1867,7 @@ canvas {
 }
 
 .slot-client-result:hover {
-    background: rgba(0, 174, 239, 0.08);
+    background: rgba(79, 70, 229, 0.08);
 }
 
 .slot-client-result-name {
@@ -1979,10 +1979,10 @@ canvas {
 }
 .payment-stat-card--debitori .stat-card-add-btn:hover { background: rgba(239,68,68,0.26); }
 .payment-stat-card--creditori .stat-card-add-btn {
-    background: rgba(0,174,239,0.14);
+    background: rgba(79,70,229,0.14);
     color: var(--primary-cyan-dark);
 }
-.payment-stat-card--creditori .stat-card-add-btn:hover { background: rgba(0,174,239,0.26); }
+.payment-stat-card--creditori .stat-card-add-btn:hover { background: rgba(79,70,229,0.26); }
 
 /* Manual entry popup */
 .manual-entry-modal { max-height: min(92vh, 560px); }
@@ -2036,7 +2036,7 @@ canvas {
 
 .manual-search-input-wrap input:focus {
     border-color: var(--primary-cyan);
-    box-shadow: 0 0 0 3px rgba(0,174,239,0.1);
+    box-shadow: 0 0 0 3px rgba(79,70,229,0.1);
     background: #fff;
 }
 .manual-search-input-wrap input:focus + .manual-search-icon,
@@ -2048,7 +2048,7 @@ canvas {
 .manual-client-selected {
     display: flex;
     align-items: center;
-    background: rgba(0,174,239,0.05);
+    background: rgba(79,70,229,0.05);
     border: 1.5px solid var(--primary-cyan);
     border-radius: 10px;
     padding: 0.55rem 0.7rem;
@@ -2164,7 +2164,7 @@ canvas {
 }
 .manual-note-input:focus {
     border-color: var(--primary-cyan);
-    box-shadow: 0 0 0 3px rgba(0,174,239,0.1);
+    box-shadow: 0 0 0 3px rgba(79,70,229,0.1);
     background: #fff;
 }
 
@@ -2238,7 +2238,7 @@ canvas {
 }
 .debtor-search-option:last-child { border-bottom: none; }
 .debtor-search-option:hover {
-    background: rgba(0, 174, 239, 0.08);
+    background: rgba(79, 70, 229, 0.08);
 }
 .debtor-search-option strong {
     font-size: 0.88rem;
@@ -2395,7 +2395,7 @@ canvas {
 .credit-action-btn:hover { opacity: 0.85; }
 
 .credit-action-btn--credit {
-    background: rgba(0,174,239,0.12);
+    background: rgba(79,70,229,0.12);
     color: #0369a1;
 }
 .credit-action-btn--debt {
@@ -2971,7 +2971,7 @@ canvas {
 
 .debt-popup-pay-btn:hover:not(:disabled) {
     background: var(--primary-cyan-dark);
-    box-shadow: 0 4px 14px rgba(0, 174, 239, 0.32);
+    box-shadow: 0 4px 14px rgba(79, 70, 229, 0.32);
 }
 
 .debt-popup-pay-btn:disabled {
@@ -3498,7 +3498,7 @@ canvas {
 }
 
 .debt-method-btn.active {
-    background: rgba(0, 174, 239, 0.1);
+    background: rgba(79, 70, 229, 0.1);
     border-color: var(--primary-cyan);
     color: var(--primary-cyan);
     font-weight: 600;
@@ -3533,7 +3533,7 @@ canvas {
 .debt-method-select:focus {
     outline: none;
     border-color: var(--primary-cyan);
-    box-shadow: 0 0 0 3px rgba(0, 174, 239, 0.1);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
 }
 
 /* Amount input */
@@ -3554,7 +3554,7 @@ canvas {
 
 .debt-amount-wrapper:focus-within {
     border-color: var(--primary-cyan);
-    box-shadow: 0 0 0 3px rgba(0, 174, 239, 0.1);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
 }
 
 .debt-euro-sign {
@@ -4348,7 +4348,7 @@ canvas {
     font-size: 0.82rem;
     border: 1px solid var(--primary-cyan, #4F46E5);
     border-radius: 6px;
-    background: rgba(0,174,239,0.08);
+    background: rgba(79,70,229,0.08);
     color: #4338CA;
     cursor: pointer;
     transition: all 0.2s;
@@ -4356,7 +4356,7 @@ canvas {
     font-weight: 600;
 }
 .btn-template-edit:hover {
-    background: rgba(0,174,239,0.18);
+    background: rgba(79,70,229,0.18);
 }
 
 /* ── Template Editor Overlay / Popup ─────────────────────────────────────── */
@@ -4536,7 +4536,7 @@ canvas {
 
 .stat-card--clickable.active {
     border: 2px solid #4F46E5;
-    box-shadow: 0 0 0 3px rgba(0,174,239,0.12), 0 4px 12px rgba(0,0,0,0.1);
+    box-shadow: 0 0 0 3px rgba(79,70,229,0.12), 0 4px 12px rgba(0,0,0,0.1);
     transform: none !important;
 }
 
